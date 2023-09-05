@@ -1,4 +1,22 @@
 services:
+  web:
+    container_name: web
+    image: goldsergeant/web
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    depends_on:
+      - mariadb
+      - redis
+  nginx:
+    container_name: nginx
+    image: goldsergeant/nginx
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
   mariadb:
     image: 'mariadb:latest'
     environment:
@@ -10,6 +28,7 @@ services:
       - '3306:3306'
     volumes:
       - ./data:/docker-entrypoint-initdb.d
+
   redis:
     # 사용할 이미지
     image: redis:latest
