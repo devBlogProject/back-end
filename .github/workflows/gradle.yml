@@ -40,7 +40,7 @@ jobs:
         # application-database.yaml 파일 생성
         touch ./application-database.properties
 
-        # GitHub-Actions 에서 설정한 값을 application-database.yaml 파일에 쓰기
+        # GitHub-Actions 에서 설정한 값을 application-database.properties 파일에 쓰기
         echo "${{ secrets.DATABASE }}" >> ./application-database.properties
       shell: bash
         
@@ -66,5 +66,5 @@ jobs:
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull ${{ secrets.DOCKER_REPO }}/web
           sudo docker pull ${{ secrets.DOCKER_REPO }}/nginx
-          docker-compose-deploy up -d
+          docker-compose up -d
           docker image prune -f
