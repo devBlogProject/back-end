@@ -1,6 +1,7 @@
 services:
   mariadb:
     image: 'mariadb:latest'
+    container_name: mariadb
     environment:
       - MARIADB_DATABASE=multi_blogging
       - MARIADB_PASSWORD=1234
