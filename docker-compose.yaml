@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: 'mariadb:latest'
+    image: mariadb:latest
     container_name: mariadb
     environment:
       - MARIADB_DATABASE=multi_blogging
