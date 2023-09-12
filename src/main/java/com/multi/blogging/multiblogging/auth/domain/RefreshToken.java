@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.index.Indexed;
 public class RefreshToken {
     @NotBlank
     @Id
-    private Long userId;
+    private Long memberId;
 
     @Indexed
     private String token;
