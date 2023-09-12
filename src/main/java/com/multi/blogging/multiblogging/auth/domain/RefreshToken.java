@@ -1,8 +1,8 @@
 package com.multi.blogging.multiblogging.auth.domain;
 
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
