@@ -39,4 +39,4 @@ out/
 /src/main/resources/application-database.properties
 /src/main/resources/env.properties
 /db/data/
-/redis/data/
+/redis/data/dump.rdb
