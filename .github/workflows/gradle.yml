@@ -43,6 +43,25 @@ jobs:
         # GitHub-Actions 에서 설정한 값을 application-database.properties 파일에 쓰기
         echo "${{ secrets.DATABASE }}" >> ./application-database.properties
       shell: bash
+
+    - name: make env.properties
+      run: |
+        cd ./src/main/resources
+
+        touch ./env.properties
+
+        echo "${{ secrets.ENV }}" >> ./env.properties
+      shell: bash
+
+    - name: make mail.properties
+      run: |
+        cd ./src/main/resources
+
+        touch ./mail.properties
+
+        # GitHub-Actions 에서 설정한 값을 application-database.properties 파일에 쓰기
+        echo "${{ secrets.MAIL }}" >> ./mail.properties
+      shell: bash
         
     ## gradle build
     - name: Build with Gradle
