@@ -38,5 +38,6 @@ out/
 
 /src/main/resources/application-database.properties
 /src/main/resources/env.properties
+/src/main/resources/mail.properties
 /db/data/
 /redis/data/dump.rdb
