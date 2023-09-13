@@ -37,4 +37,14 @@ class MemberRepositoryTest {
         assertEquals(member_cal.get(Calendar.DAY_OF_MONTH),now_cal.get(Calendar.DAY_OF_MONTH) );
         assertEquals(member_cal.get(Calendar.HOUR),now_cal.get(Calendar.HOUR) );
     }
+
+    @Test
+    void findOneByMemberEmail(){
+        String testEmail="test@test.com";
+        Member member =Member.builder().memberEmail(testEmail).password("1234").nickName("test").build();
+        memberRepository.save(member);
+        Member findMember=memberRepository.findOneByMemberEmail(testEmail).get();
+
+        assertEquals(member,findMember);
+    }
 }
