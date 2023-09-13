@@ -1,5 +1,6 @@
 package com.multi.blogging.multiblogging.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,8 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.sql.Timestamp;
 
 @Entity
-@Getter @Setter
-@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 public class Member {
 
@@ -27,14 +28,18 @@ public class Member {
     @Column(nullable = false)
     private String nickName;
 
-    @Column(name="member_role")
+    @Column(name = "member_role")
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
     @CreationTimestamp
     private Timestamp createDate;
 
-    public Member() {
-
+    @Builder
+    public Member(String memberEmail, String password, String nickName, Authority authority) {
+        this.memberEmail=memberEmail;
+        this.password=password;
+        this.nickName=nickName;
+        this.authority=authority;
     }
 }
