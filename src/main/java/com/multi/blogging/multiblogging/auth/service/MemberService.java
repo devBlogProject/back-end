@@ -7,11 +7,13 @@ import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -20,8 +22,10 @@ public class MemberService {
 
     @Transactional
     public MemberSignUpResponseDto signUp(MemberSignUpRequestDto dto){
-        if (memberRepository.findOneByMemberEmail(dto.getEmail()).isPresent())
+        if (memberRepository.findOneByMemberEmail(dto.getEmail()).isPresent()) {
+            log.debug("MemberService.singUp EmailDuplicatedException occur dto.email: {}",dto.getEmail());
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
+        }
 
         Member member = Member.builder()
                 .memberEmail(dto.getEmail())
