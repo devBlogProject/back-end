@@ -5,10 +5,12 @@ import com.multi.blogging.multiblogging.auth.dto.MemberSignUpResponseDto;
 import com.multi.blogging.multiblogging.auth.dto.MemberSignUpRequestDto;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,8 @@ public class MemberService {
         if (dto.getNickName()!=null){
             member.setNickName(dto.getNickName());
         }
+
+        memberRepository.save(member);
 
         return MemberSignUpResponseDto.of(member);
     }

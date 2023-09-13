@@ -25,7 +25,7 @@ public class Member {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @Column(nullable = false)
+    @Column()
     private String nickName;
 
     @Column(name = "member_role")

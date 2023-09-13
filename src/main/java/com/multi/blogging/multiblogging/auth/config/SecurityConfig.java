@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/auth/signup").permitAll()
                         .requestMatchers("/v3/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/sample").permitAll()
@@ -41,7 +42,6 @@ public class SecurityConfig {
                 .exceptionHandling(c -> c.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeniedHandler))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .apply(new JwtSecurityConfig(tokenProvider));
-
 
         return http.build();
     }
