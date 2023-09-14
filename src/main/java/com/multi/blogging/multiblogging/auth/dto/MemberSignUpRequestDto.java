@@ -14,6 +14,4 @@ public class MemberSignUpRequestDto {
     @Size(min = 4, message = "비밀번호는 4자리 이상이어야 합니다.")
     @NotBlank(message = "비밀번호에는 공백이 포함될 수 없습니다.")
     private String password;
-
-    private String nickName;
 }

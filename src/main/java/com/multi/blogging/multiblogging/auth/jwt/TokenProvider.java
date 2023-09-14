@@ -24,7 +24,8 @@ import org.springframework.security.core.GrantedAuthority;
 @Component
 public class TokenProvider implements InitializingBean {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final String secret;
+
+    private String secret;
     private static final String AUTHORITIES_KEY = "auth";
     private Key key;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30; //30분
@@ -36,6 +37,7 @@ public class TokenProvider implements InitializingBean {
         this.secret = secret;
         this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
+
 
 
     public String createAccessToken(Authentication authentication) {
@@ -51,6 +53,17 @@ public class TokenProvider implements InitializingBean {
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
+                .compact();
+    }
+
+    public String createRefreshToken(Authentication authentication) {
+        Date date = new Date();
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .setExpiration(new Date(date.getTime()+ REFRESH_TOKEN_EXPIRE_TIME))
+                .setIssuedAt(date)
+                .signWith(key)
                 .compact();
     }
 

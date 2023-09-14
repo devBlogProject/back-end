@@ -25,7 +25,7 @@ public class Member {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @Column()
+    @Column(length = 50)
     private String nickName;
 
     @Column(name = "member_role")
@@ -41,5 +41,9 @@ public class Member {
         this.password=password;
         this.nickName=nickName;
         this.authority=authority;
+    }
+
+    public Member() {
+
     }
 }
