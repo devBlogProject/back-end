@@ -11,12 +11,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component("userDetailsService")
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
