@@ -3,6 +3,7 @@ package com.multi.blogging.multiblogging.auth.domain;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 @Getter @Setter
 @AllArgsConstructor
@@ -10,6 +11,7 @@ import org.springframework.data.redis.core.RedisHash;
 public class RefreshToken {
     @Id
     private String memberEmail;
+    @Indexed
     private String token;
 
     public RefreshToken updateToken(String token){
