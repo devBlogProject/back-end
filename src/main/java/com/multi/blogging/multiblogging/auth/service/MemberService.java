@@ -1,23 +1,22 @@
 package com.multi.blogging.multiblogging.auth.service;
 
+import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.auth.config.SecurityConfig;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.domain.RefreshToken;
-import com.multi.blogging.multiblogging.auth.dto.MemberLoginRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.MemberSignUpResponseDto;
-import com.multi.blogging.multiblogging.auth.dto.MemberSignUpRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.TokenDto;
+import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.EmailDuplicateException;
+import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.jwt.TokenProvider;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.auth.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -38,7 +37,35 @@ public class AuthService {
     private final UserDetailsServiceImpl userDetailsService;
 
     @Transactional
-    public MemberSignUpResponseDto signUp(MemberSignUpRequestDto dto) {
+    public MemberResponseDto modifyNickName(ModifyNickNameRequestDto dto){
+        String memberEmail = SecurityUtil.getCurrentMemberEmail();
+        Optional<Member> member = memberRepository.findOneByMemberEmail(memberEmail);
+        if (member.isEmpty()){
+            throw new MemberNotFoundException();
+        }
+        member.get().setNickName(dto.getNickName());
+        return MemberResponseDto.of(member.get());
+    }
+
+    @Transactional
+    public MemberResponseDto getMemberProfile(){
+        String memberEmail = SecurityUtil.getCurrentMemberEmail();
+        Optional<Member> member = memberRepository.findOneByMemberEmail(memberEmail);
+        if (member.isEmpty()){
+            throw new MemberNotFoundException();
+        }
+        return MemberResponseDto.of(member.get());
+    }
+
+    public String logout(){
+        String memberEmail = SecurityUtil.getCurrentMemberEmail();
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(memberEmail);
+        refreshToken.ifPresent(refreshTokenRepository::delete);
+        return "로그아웃 되었습니다.";
+    }
+
+    @Transactional
+    public MemberResponseDto signUp(MemberSignUpRequestDto dto) {
         if (memberRepository.findOneByMemberEmail(dto.getEmail()).isPresent()) {
             log.debug("MemberService.singUp EmailDuplicatedException occur dto.email: {}", dto.getEmail());
             throw new EmailDuplicateException();
@@ -52,7 +79,7 @@ public class AuthService {
 
         memberRepository.save(member);
 
-        return MemberSignUpResponseDto.of(member);
+        return MemberResponseDto.of(member);
     }
 
     @Transactional

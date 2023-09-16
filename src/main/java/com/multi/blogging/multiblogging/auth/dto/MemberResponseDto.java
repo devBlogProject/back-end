@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 
 @Data
 @Builder
-public class MemberSignUpResponseDto {
+public class MemberResponseDto {
     private String memberEmail; //이메일
 
     private String nickName;
@@ -18,8 +18,8 @@ public class MemberSignUpResponseDto {
 
     private Timestamp createDate;
 
-    public static MemberSignUpResponseDto of(Member member){
-        return MemberSignUpResponseDto.builder()
+    public static MemberResponseDto of(Member member){
+        return MemberResponseDto.builder()
                 .memberEmail(member.getMemberEmail())
                 .nickName(member.getNickName())
                 .authority(member.getAuthority())
