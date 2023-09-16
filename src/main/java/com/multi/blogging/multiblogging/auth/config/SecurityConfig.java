@@ -35,10 +35,11 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/member/signup").permitAll()
-                        .requestMatchers("/member/login").permitAll()
-                        .requestMatchers("/member/refresh").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers("/v3/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/email/**").permitAll()
 //                        .requestMatchers("/sample").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
