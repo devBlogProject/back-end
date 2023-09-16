@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class MemberSignUpRequestDto {
     @NotEmpty(message = "이메일을 입력해주세요.")
-    @Email(message = "올바른 이메일 형식이 아닙니다.")
+    @Email(message = "이메일 형식으로 입력해주세요.")
     @NotBlank(message = "이메일에는 공백이 포함될 수 없습니다.")
     private String email;
 

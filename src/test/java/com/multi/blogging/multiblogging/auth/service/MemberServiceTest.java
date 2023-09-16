@@ -25,6 +25,9 @@ class MemberServiceTest {
     MemberService memberService;
 
     @Autowired
+    AuthService authService;
+
+    @Autowired
     RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
@@ -43,14 +46,14 @@ class MemberServiceTest {
         memberLoginRequestDto.setEmail(signUpMember.getMemberEmail());
         memberLoginRequestDto.setPassword(signUpMember.getPassword());
 
-        memberService.login(memberLoginRequestDto);
+        authService.login(memberLoginRequestDto);
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetails user = userDetailsService.loadUserByUsername(signUpMember.getMemberEmail());
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
         assertNotNull(
                 refreshTokenRepository.findById(signUpMember.getMemberEmail())
         );
-        memberService.logout();
+        authService.logout();
 
         assertEquals(refreshTokenRepository.findById(signUpMember.getMemberEmail()), Optional.empty());
     }
