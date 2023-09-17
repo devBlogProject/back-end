@@ -6,13 +6,14 @@ import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.EmailDuplicateException;
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
+import com.multi.blogging.multiblogging.auth.exception.PasswordNotMachingException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
-import com.multi.blogging.multiblogging.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 @Slf4j
@@ -33,10 +34,10 @@ public class MemberService {
 
 
     @Transactional
-    public MemberResponseDto modifyNickName(ModifyNickNameRequestDto dto){
+    public MemberResponseDto modifyNickName(ModifyNickNameRequestDto dto) {
         String memberEmail = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByMemberEmail(memberEmail);
-        if (member.isEmpty()){
+        if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
         member.get().setNickName(dto.getNickName());
@@ -44,24 +45,26 @@ public class MemberService {
     }
 
     @Transactional
-    public void modifyPassword(ModifyPasswordRequestDto dto){
-        Optional<Member> member = memberRepository.findOneByMemberEmail(dto.getEmail());
-        if (member.isEmpty()){
+    public void modifyPassword(ModifyPasswordRequestDto dto) {
+        Optional<Member> member = memberRepository.findOneByMemberEmail(SecurityUtil.getCurrentMemberEmail());
+        if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        member.get().setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (!passwordEncoder.matches(dto.getOldPassword(), member.get().getPassword())) {
+            throw new PasswordNotMachingException();
+        }
+        member.get().setPassword(passwordEncoder.encode(dto.getNewPassword()));
     }
 
     @Transactional
-    public MemberResponseDto getMemberProfile(){
+    public MemberResponseDto getMemberProfile() {
         String memberEmail = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByMemberEmail(memberEmail);
-        if (member.isEmpty()){
+        if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
         return MemberResponseDto.of(member.get());
     }
-
 
 
     @Transactional
@@ -81,7 +84,6 @@ public class MemberService {
 
         return MemberResponseDto.of(member);
     }
-
 
 
 }

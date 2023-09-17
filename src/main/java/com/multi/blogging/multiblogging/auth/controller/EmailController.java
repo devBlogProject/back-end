@@ -20,7 +20,7 @@ public class EmailController {
 
     private final EmailService emailService;
     @PostMapping("/verification-requests")
-    public ResponseEntity sendMessage(@RequestParam("email") @Valid @Email(message = "이메일 형식으로 입력해주세요.") String email) throws Exception {
+    public ResponseEntity<Void> sendMessage(@RequestParam("email") @Valid @Email(message = "이메일 형식으로 입력해주세요.") String email) throws Exception {
         String code = emailService.createCode();
         emailService.sendAuthCodeEmail(email,"Multiblogging 인증코드",code);
 
