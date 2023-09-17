@@ -15,8 +15,8 @@ class MailServiceTest {
     private String testUserEmail="rmagksfla000@naver.com";
 
     @Test
-    void 메일발송테스트(){
-        mailService.sendEmail(testUserEmail,"테스트이메일 제목","테스트이메일 내용");
+    void 메일발송테스트() throws Exception {
+        mailService.sendAuthCodeEmail(testUserEmail,"테스트이메일 제목","테스트이메일 내용");
     }
 
 }
