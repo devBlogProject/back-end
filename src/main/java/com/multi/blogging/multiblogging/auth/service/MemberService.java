@@ -8,6 +8,7 @@ import com.multi.blogging.multiblogging.auth.exception.EmailDuplicateException;
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.exception.PasswordNotMachingException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
+import com.multi.blogging.multiblogging.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static com.multi.blogging.multiblogging.auth.service.EmailService.AUTH_CODE_PREFIX;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,14 +26,10 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
 
-//    public EmailVerificationResult verifiedCode(String email, String authCode) {
-//        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
-//        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
-//
-//        return EmailVerificationResult.of(authResult);
-//    }
+
 
 
     @Transactional

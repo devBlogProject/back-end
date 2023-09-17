@@ -25,7 +25,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailService {
     private final JavaMailSender mailSender;
-    private static final String AUTH_CODE_PREFIX = "AuthCode ";
+    public static final String AUTH_CODE_PREFIX = "AuthCode ";
     private static final long authCodeExpirationMillis = 1000*60*30; // 30분
     private final RedisService redisService;
 
@@ -42,6 +42,13 @@ public class EmailService {
             throw new RuntimeException("메일 발송 실패");
         }
     }
+
+//    public EmailVerificationResponseDto verifiedCode(String email, String authCode) {
+//        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
+//        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
+//
+//        return EmailVerificationResponseDto.of(authResult);
+//    }
 
     private MimeMessage createMessage(String toEmail,String title, String code) throws Exception{
         log.info("보내는 대상 : {}, 인증번호 : {}, 발송 시간 : {}",toEmail,code,System.currentTimeMillis());
