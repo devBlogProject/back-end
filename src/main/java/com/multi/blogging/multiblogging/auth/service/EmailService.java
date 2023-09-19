@@ -1,5 +1,11 @@
 package com.multi.blogging.multiblogging.auth.service;
 
+import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.auth.dto.EmailVerificationResponseDto;
+import com.multi.blogging.multiblogging.auth.exception.MailCodeNotMatchingException;
+import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
+import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.redis.RedisService;
 import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
@@ -9,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -18,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Optional;
 import java.util.Random;
 
 @Slf4j
@@ -28,10 +37,13 @@ public class EmailService {
     public static final String AUTH_CODE_PREFIX = "AuthCode ";
     private static final long authCodeExpirationMillis = 1000*60*30; // 30분
     private final RedisService redisService;
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${spring.mail.username}")
     private String fromUser;
 
+    @Transactional
     public void sendAuthCodeEmail(String toEmail, String title, String text) throws Exception {
         MimeMessage message = createMessage(toEmail,title,text);
         redisService.setValues(AUTH_CODE_PREFIX+toEmail,text, Duration.ofMillis(authCodeExpirationMillis));
@@ -43,12 +55,24 @@ public class EmailService {
         }
     }
 
-//    public EmailVerificationResponseDto verifiedCode(String email, String authCode) {
-//        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
-//        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
-//
-//        return EmailVerificationResponseDto.of(authResult);
-//    }
+    @Transactional
+    public EmailVerificationResponseDto verifiedCode(String email, String authCode) {
+        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
+        if (!(redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode))) {
+            throw new MailCodeNotMatchingException();
+        }
+        Optional<Member> member = memberRepository.findOneByMemberEmail(email);
+        if (member.isEmpty()){
+            throw new MemberNotFoundException();
+        }
+        String temporaryPassword=SecurityUtil.createRamdomPassword(10);
+        member.get().setPassword(passwordEncoder.encode(temporaryPassword));
+        EmailVerificationResponseDto emailVerificationResponseDto = new EmailVerificationResponseDto();
+        emailVerificationResponseDto.setTemporaryPassword(temporaryPassword);
+        redisService.deleteValues(AUTH_CODE_PREFIX+email);
+
+        return emailVerificationResponseDto;
+    }
 
     private MimeMessage createMessage(String toEmail,String title, String code) throws Exception{
         log.info("보내는 대상 : {}, 인증번호 : {}, 발송 시간 : {}",toEmail,code,System.currentTimeMillis());

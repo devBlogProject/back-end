@@ -26,7 +26,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RedisService redisService;
 
 
 
