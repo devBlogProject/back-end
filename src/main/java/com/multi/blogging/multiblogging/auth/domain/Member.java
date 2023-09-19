@@ -5,6 +5,7 @@ import com.multi.blogging.multiblogging.auth.enums.Authority;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Timestamp;
 
@@ -45,5 +46,9 @@ public class Member {
 
     public Member() {
 
+    }
+
+    public void updatePassword(PasswordEncoder passwordEncoder,String newPassword){
+        setPassword(passwordEncoder.encode(newPassword));
     }
 }

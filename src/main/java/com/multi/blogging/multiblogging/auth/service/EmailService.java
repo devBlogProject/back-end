@@ -66,7 +66,7 @@ public class EmailService {
             throw new MemberNotFoundException();
         }
         String temporaryPassword=SecurityUtil.createRamdomPassword(10);
-        member.get().setPassword(passwordEncoder.encode(temporaryPassword));
+        member.get().updatePassword(passwordEncoder,temporaryPassword);
         EmailVerificationResponseDto emailVerificationResponseDto = new EmailVerificationResponseDto();
         emailVerificationResponseDto.setTemporaryPassword(temporaryPassword);
         redisService.deleteValues(AUTH_CODE_PREFIX+email);

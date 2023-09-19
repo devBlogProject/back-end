@@ -51,7 +51,7 @@ public class MemberService {
         if (!passwordEncoder.matches(dto.getOldPassword(), member.get().getPassword())) {
             throw new PasswordNotMachingException();
         }
-        member.get().setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        member.get().updatePassword(passwordEncoder,dto.getNewPassword());
     }
 
     @Transactional
