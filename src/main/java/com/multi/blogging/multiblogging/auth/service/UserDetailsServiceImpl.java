@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private org.springframework.security.core.userdetails.User createUser(Member member) {
 
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority().toString());
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getAuthority().getKey());
 
         return new org.springframework.security.core.userdetails.User(member.getEmail(),
                 member.getPassword(),

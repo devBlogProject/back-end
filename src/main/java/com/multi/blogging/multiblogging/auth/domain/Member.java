@@ -23,11 +23,13 @@ public class Member {
     @Column(name="member_email",nullable = false, length = 50)
     private String email; //이메일
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String password;
 
-    @Column(length = 50,nullable = false,unique = true)
+    @Column(length = 50,unique = true)
     private String nickName;
+
+    private String imageUrl; // 프로필 이미지
 
     @Column(name = "member_role")
     @Enumerated(EnumType.STRING)
@@ -36,15 +38,19 @@ public class Member {
     @CreationTimestamp
     private Timestamp createDate;
 
+    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
     @Enumerated(EnumType.STRING)
     private SocialType socialType; // KAKAO, NAVER, GOOGLE
 
     @Builder
-    public Member(String email, String password, String nickName, Authority authority) {
+    public Member(String email, String password, String nickName, Authority authority,SocialType socialType,String socialId,String imageUrl) {
         this.email =email;
         this.password=password;
         this.nickName=nickName;
         this.authority=authority;
+        this.socialType=socialType;
+        this.socialId=socialId;
+        this.imageUrl=imageUrl;
     }
 
     public Member() {
