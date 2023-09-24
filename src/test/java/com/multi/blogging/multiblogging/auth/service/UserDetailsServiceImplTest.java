@@ -42,7 +42,7 @@ class UserDetailsServiceImplTest {
                 .email(testEmail)
                 .password("1234")
                 .nickName("test")
-                .authority(Authority.ROLE_MEMBER)
+                .authority(Authority.MEMBER)
                 .build();
         em.persist(member);
 

@@ -1,6 +1,7 @@
 package com.multi.blogging.multiblogging.auth.domain;
 
 import com.multi.blogging.multiblogging.auth.enums.Authority;
+import com.multi.blogging.multiblogging.auth.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,7 +26,7 @@ public class Member {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @Column(length = 50)
+    @Column(length = 50,nullable = false,unique = true)
     private String nickName;
 
     @Column(name = "member_role")
@@ -34,6 +35,9 @@ public class Member {
 
     @CreationTimestamp
     private Timestamp createDate;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType; // KAKAO, NAVER, GOOGLE
 
     @Builder
     public Member(String email, String password, String nickName, Authority authority) {

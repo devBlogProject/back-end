@@ -47,4 +47,24 @@ class MemberRepositoryTest {
 
         assertEquals(member,findMember);
     }
+
+    @Test
+    void 이메일중복체크(){
+        String testEmail="test@test.com";
+        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        memberRepository.save(member);
+
+        assertTrue(memberRepository.existsByEmail(testEmail));
+        assertFalse(memberRepository.existsByEmail("notexistEmail@test.com"));
+    }
+
+    @Test
+    void 닉네임중복체크(){
+        String testEmail="test@test.com";
+        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        memberRepository.save(member);
+
+        assertTrue(memberRepository.existsByNickName("test"));
+        assertFalse(memberRepository.existsByNickName("test1"));
+    }
 }

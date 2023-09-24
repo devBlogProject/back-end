@@ -1,5 +1,10 @@
 package com.multi.blogging.multiblogging.auth.enums;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum Authority {
-    ROLE_MEMBER, ROLE_ADMIN
+    GUEST("ROLE_GUEST"),MEMBER("ROLE_MEMBER"), ADMIN("ROLE_ADMIN");
+
+    private final String key;
 }

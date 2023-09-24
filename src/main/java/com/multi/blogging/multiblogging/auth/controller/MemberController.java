@@ -38,5 +38,13 @@ public class MemberController {
         return new ResponseEntity<>(memberService.signUp(memberSignUpRequestDto), HttpStatus.CREATED);
     }
 
+    @GetMapping("/email/{email}/exists")
+    public ResponseEntity<Boolean> checkEmailDuplicate(@PathVariable String email){
+        return ResponseEntity.ok(memberService.checkEmailDuplicate(email));
+    }
 
+    @GetMapping("/nickname/{nickname}/exists")
+    public ResponseEntity<Boolean> checkNickNameDuplicate(@PathVariable String nickname){
+        return ResponseEntity.ok(memberService.checkNickNameDuplicate(nickname));
+    }
 }

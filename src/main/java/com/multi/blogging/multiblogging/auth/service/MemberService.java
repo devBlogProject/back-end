@@ -6,6 +6,7 @@ import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.EmailDuplicateException;
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
+import com.multi.blogging.multiblogging.auth.exception.NickNameDuplicateException;
 import com.multi.blogging.multiblogging.auth.exception.PasswordNotMachingException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.redis.RedisService;
@@ -34,6 +35,9 @@ public class MemberService {
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
+        }
+        if (memberRepository.existsByNickName(dto.getNickName())){
+            throw new NickNameDuplicateException();
         }
         member.get().setNickName(dto.getNickName());
         return MemberResponseDto.of(member.get());
@@ -69,9 +73,15 @@ public class MemberService {
             throw new EmailDuplicateException();
         }
 
+        if (memberRepository.existsByNickName(dto.getNickName())){
+            log.debug("MemberService.singUp NickNameDuplicatedException occur dto.nickName: {}", dto.getNickName());
+            throw new NickNameDuplicateException();
+        }
+
         Member member = Member.builder()
                 .email(dto.getEmail())
-                .authority(Authority.ROLE_MEMBER)
+                .nickName(dto.getNickName())
+                .authority(Authority.MEMBER)
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .build();
 
@@ -81,4 +91,11 @@ public class MemberService {
     }
 
 
+    public boolean checkEmailDuplicate(String email){
+        return !memberRepository.existsByEmail(email);
+    }
+
+    public boolean checkNickNameDuplicate(String nickName){
+        return !memberRepository.existsByNickName(nickName);
+    }
 }
