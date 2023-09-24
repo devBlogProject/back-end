@@ -39,7 +39,7 @@ class UserDetailsServiceImplTest {
     void loadUserByUserName() {
         String testEmail = "test@test.com";
         Member member = Member.builder()
-                .memberEmail(testEmail)
+                .email(testEmail)
                 .password("1234")
                 .nickName("test")
                 .authority(Authority.ROLE_MEMBER)

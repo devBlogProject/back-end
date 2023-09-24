@@ -29,8 +29,8 @@ public class AuthService {
 
 
     public String logout() {
-        String memberEmail = SecurityUtil.getCurrentMemberEmail();
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(memberEmail);
+        String email = SecurityUtil.getCurrentMemberEmail();
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(email);
         refreshToken.ifPresent(refreshTokenRepository::delete);
         return "로그아웃 되었습니다.";
     }

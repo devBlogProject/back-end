@@ -34,27 +34,27 @@ class MemberServiceTest {
     UserDetailsServiceImpl userDetailsService;
     @Test
     void logout(){
-        Member signUpMember= Member.builder().memberEmail("test@test.com")
+        Member signUpMember= Member.builder().email("test@test.com")
                 .password("1234")
                 .build();
         MemberSignUpRequestDto signUpRequestDto= new MemberSignUpRequestDto();
-        signUpRequestDto.setEmail(signUpMember.getMemberEmail());
+        signUpRequestDto.setEmail(signUpMember.getEmail());
         signUpRequestDto.setPassword(signUpMember.getPassword());
         memberService.signUp(signUpRequestDto);
 
         MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto();
-        memberLoginRequestDto.setEmail(signUpMember.getMemberEmail());
+        memberLoginRequestDto.setEmail(signUpMember.getEmail());
         memberLoginRequestDto.setPassword(signUpMember.getPassword());
 
         authService.login(memberLoginRequestDto);
         SecurityContext context = SecurityContextHolder.getContext();
-        UserDetails user = userDetailsService.loadUserByUsername(signUpMember.getMemberEmail());
+        UserDetails user = userDetailsService.loadUserByUsername(signUpMember.getEmail());
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
         assertNotNull(
-                refreshTokenRepository.findById(signUpMember.getMemberEmail())
+                refreshTokenRepository.findById(signUpMember.getEmail())
         );
         authService.logout();
 
-        assertEquals(refreshTokenRepository.findById(signUpMember.getMemberEmail()), Optional.empty());
+        assertEquals(refreshTokenRepository.findById(signUpMember.getEmail()), Optional.empty());
     }
 }

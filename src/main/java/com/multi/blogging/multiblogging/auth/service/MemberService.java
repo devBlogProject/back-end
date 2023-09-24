@@ -28,13 +28,10 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
 
-
-
-
     @Transactional
     public MemberResponseDto modifyNickName(ModifyNickNameRequestDto dto) {
-        String memberEmail = SecurityUtil.getCurrentMemberEmail();
-        Optional<Member> member = memberRepository.findOneByMemberEmail(memberEmail);
+        String email = SecurityUtil.getCurrentMemberEmail();
+        Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
@@ -44,7 +41,7 @@ public class MemberService {
 
     @Transactional
     public void modifyPassword(ModifyPasswordRequestDto dto) {
-        Optional<Member> member = memberRepository.findOneByMemberEmail(SecurityUtil.getCurrentMemberEmail());
+        Optional<Member> member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail());
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
@@ -56,8 +53,8 @@ public class MemberService {
 
     @Transactional
     public MemberResponseDto getMemberProfile() {
-        String memberEmail = SecurityUtil.getCurrentMemberEmail();
-        Optional<Member> member = memberRepository.findOneByMemberEmail(memberEmail);
+        String email = SecurityUtil.getCurrentMemberEmail();
+        Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
@@ -67,13 +64,13 @@ public class MemberService {
 
     @Transactional
     public MemberResponseDto signUp(MemberSignUpRequestDto dto) {
-        if (memberRepository.findOneByMemberEmail(dto.getEmail()).isPresent()) {
+        if (memberRepository.findOneByEmail(dto.getEmail()).isPresent()) {
             log.debug("MemberService.singUp EmailDuplicatedException occur dto.email: {}", dto.getEmail());
             throw new EmailDuplicateException();
         }
 
         Member member = Member.builder()
-                .memberEmail(dto.getEmail())
+                .email(dto.getEmail())
                 .authority(Authority.ROLE_MEMBER)
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .build();

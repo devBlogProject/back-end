@@ -1,6 +1,5 @@
 package com.multi.blogging.multiblogging.auth.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,8 +19,8 @@ public class Member {
     @Column(name = "member_id", unique = true, nullable = false)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String memberEmail; //이메일
+    @Column(name="member_email",nullable = false, length = 50)
+    private String email; //이메일
 
     @Column(nullable = false, length = 100)
     private String password;
@@ -37,8 +36,8 @@ public class Member {
     private Timestamp createDate;
 
     @Builder
-    public Member(String memberEmail, String password, String nickName, Authority authority) {
-        this.memberEmail=memberEmail;
+    public Member(String email, String password, String nickName, Authority authority) {
+        this.email =email;
         this.password=password;
         this.nickName=nickName;
         this.authority=authority;

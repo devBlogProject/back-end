@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Data
 @Builder
 public class MemberResponseDto {
-    private String memberEmail; //이메일
+    private String email; //이메일
 
     private String nickName;
 
@@ -20,7 +20,7 @@ public class MemberResponseDto {
 
     public static MemberResponseDto of(Member member){
         return MemberResponseDto.builder()
-                .memberEmail(member.getMemberEmail())
+                .email(member.getEmail())
                 .nickName(member.getNickName())
                 .authority(member.getAuthority())
                 .createDate(member.getCreateDate())

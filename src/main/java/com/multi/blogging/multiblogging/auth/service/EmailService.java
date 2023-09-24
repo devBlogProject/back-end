@@ -61,7 +61,7 @@ public class EmailService {
         if (!(redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode))) {
             throw new MailCodeNotMatchingException();
         }
-        Optional<Member> member = memberRepository.findOneByMemberEmail(email);
+        Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()){
             throw new MemberNotFoundException();
         }

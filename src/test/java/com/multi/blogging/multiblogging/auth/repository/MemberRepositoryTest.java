@@ -24,7 +24,7 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
     @Test
     void save(){
-        Member member = Member.builder().memberEmail("test@test.com").password("1234").nickName("test").build();
+        Member member = Member.builder().email("test@test.com").password("1234").nickName("test").build();
         assertTrue(memberRepository.findAll().isEmpty());
         memberRepository.save(member);
         assertEquals(memberRepository.findAll().toArray().length,1);
@@ -39,11 +39,11 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void findOneByMemberEmail(){
+    void findOneByEmail(){
         String testEmail="test@test.com";
-        Member member =Member.builder().memberEmail(testEmail).password("1234").nickName("test").build();
+        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
         memberRepository.save(member);
-        Member findMember=memberRepository.findOneByMemberEmail(testEmail).get();
+        Member findMember=memberRepository.findOneByEmail(testEmail).get();
 
         assertEquals(member,findMember);
     }
