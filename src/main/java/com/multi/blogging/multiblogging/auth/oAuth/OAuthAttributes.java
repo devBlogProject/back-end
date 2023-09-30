@@ -1,5 +1,6 @@
 package com.multi.blogging.multiblogging.auth.oAuth;
 
+import com.multi.blogging.multiblogging.auth.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.enums.SocialType;
@@ -72,6 +73,7 @@ public class OAuthAttributes {
                 .email(oauth2UserInfo.getEmail())
                 .nickName(oauth2UserInfo.getNickname())
                 .imageUrl(oauth2UserInfo.getImageUrl())
+                .password(SecurityUtil.createRamdomPassword(10))
                 .authority(Authority.MEMBER)
                 .build();
     }
