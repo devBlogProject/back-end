@@ -46,7 +46,7 @@ public class AuthService {
         String accessToken = tokenProvider.createAccessToken(authentication);
         String refreshTokenString = tokenProvider.createRefreshToken(authentication);
 
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(refreshTokenString);
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(authentication.getName());
         if (refreshToken.isPresent()) {
             refreshTokenRepository.save(refreshToken.get().updateToken(refreshTokenString));
         } else {

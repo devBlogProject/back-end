@@ -45,6 +45,12 @@ public class SecurityConfig {
 //                        .requestMatchers("/sample").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
+                //== 소셜 로그인 설정 ==//
+                .oauth2Login()
+                .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
+                .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
+                .userInfoEndpoint().userService(customOAuth2UserService) // customUserzService 설정
+
                 .exceptionHandling(c -> c.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeniedHandler))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .apply(new JwtSecurityConfig(tokenProvider));
