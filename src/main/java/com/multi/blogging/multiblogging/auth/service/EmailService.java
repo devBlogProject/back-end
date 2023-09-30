@@ -5,6 +5,7 @@ import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.dto.EmailVerificationResponseDto;
 import com.multi.blogging.multiblogging.auth.exception.MailCodeNotMatchingException;
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
+import com.multi.blogging.multiblogging.auth.exception.SocialMemberDuplicateException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.redis.RedisService;
 import jakarta.mail.Message;
@@ -45,6 +46,10 @@ public class EmailService {
 
     @Transactional
     public void sendAuthCodeEmail(String toEmail, String title, String text) throws Exception {
+        Optional<Member> member = memberRepository.findOneByEmail(toEmail);
+        if (member.isPresent() && member.get().getSocialType()!=null){
+            throw new SocialMemberDuplicateException();
+        }
         MimeMessage message = createMessage(toEmail,title,text);
         redisService.setValues(AUTH_CODE_PREFIX+toEmail,text, Duration.ofMillis(authCodeExpirationMillis));
         try {
@@ -64,6 +69,9 @@ public class EmailService {
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()){
             throw new MemberNotFoundException();
+        }
+        else if (member.get().getSocialType()!=null){
+            throw new SocialMemberDuplicateException();
         }
         String temporaryPassword=SecurityUtil.createRamdomPassword(10);
         member.get().updatePassword(passwordEncoder,temporaryPassword);
