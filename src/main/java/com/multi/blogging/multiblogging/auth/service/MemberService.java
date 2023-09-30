@@ -4,10 +4,7 @@ import com.multi.blogging.multiblogging.auth.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
-import com.multi.blogging.multiblogging.auth.exception.EmailDuplicateException;
-import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
-import com.multi.blogging.multiblogging.auth.exception.NickNameDuplicateException;
-import com.multi.blogging.multiblogging.auth.exception.PasswordNotMachingException;
+import com.multi.blogging.multiblogging.auth.exception.*;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.redis.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -68,8 +65,12 @@ public class MemberService {
 
     @Transactional
     public MemberResponseDto signUp(MemberSignUpRequestDto dto) {
-        if (memberRepository.findOneByEmail(dto.getEmail()).isPresent()) {
+        Member findMember = memberRepository.findOneByEmail(dto.getEmail()).orElse(null);
+        if (findMember!=null) {
             log.debug("MemberService.singUp EmailDuplicatedException occur dto.email: {}", dto.getEmail());
+            if (findMember.getSocialType()!=null){
+                throw new SocialMemberDuplicateException();
+            }
             throw new EmailDuplicateException();
         }
 
