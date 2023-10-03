@@ -6,7 +6,6 @@ import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.*;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
-import com.multi.blogging.multiblogging.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
-import static com.multi.blogging.multiblogging.auth.service.EmailService.AUTH_CODE_PREFIX;
 
 @Slf4j
 @Service
@@ -60,6 +57,14 @@ public class MemberService {
             throw new MemberNotFoundException();
         }
         return MemberResponseDto.of(member.get());
+    }
+
+    @Transactional
+    public MemberResponseDto updateMemberProfileImage(UpdateProfileImageRequestDto dto){
+        Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+        member.setImageUrl(dto.imageUrl);
+
+        return MemberResponseDto.of(member);
     }
 
 

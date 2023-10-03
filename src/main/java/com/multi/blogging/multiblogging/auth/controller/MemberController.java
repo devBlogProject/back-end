@@ -20,6 +20,11 @@ public class MemberController {
         return ResponseEntity.ok(memberService.modifyNickName(modifyNickNameRequestDto));
     }
 
+    @PutMapping("/image")
+    public ResponseEntity<MemberResponseDto> updateProfileImage(@Valid @RequestBody UpdateProfileImageRequestDto updateProfileImageRequestDto){
+        return ResponseEntity.ok(memberService.updateMemberProfileImage(updateProfileImageRequestDto));
+    }
+
     @PutMapping("/password")
     public ResponseEntity<String> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto){
         memberService.modifyPassword(modifyPasswordRequestDto);

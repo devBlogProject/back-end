@@ -18,12 +18,15 @@ public class MemberResponseDto {
 
     private Timestamp createDate;
 
+    private String imageUrl;
+
     public static MemberResponseDto of(Member member){
         return MemberResponseDto.builder()
                 .email(member.getEmail())
                 .nickName(member.getNickName())
                 .authority(member.getAuthority())
                 .createDate(member.getCreateDate())
+                .imageUrl(member.getImageUrl())
                 .build();
     }
 }
