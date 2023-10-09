@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,5 +67,22 @@ class MemberRepositoryTest {
 
         assertTrue(memberRepository.existsByNickName("test"));
         assertFalse(memberRepository.existsByNickName("test1"));
+    }
+
+    @Test
+    void findByNickNameStartsWith(){
+        String props="test";
+        Member member1 =Member.builder().email("test1@test.com").password("1234").nickName(props).build();
+        Member member2 =Member.builder().email("test2@test.com").password("1234").nickName(props+"123").build();
+        Member member3 =Member.builder().email("test3@test.com").password("1234").nickName(props+"223").build();
+        Member member4 =Member.builder().email("test4@test.com").password("1234").nickName("123"+props).build();
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+        memberRepository.save(member4);
+
+        List<Member> findMembers = memberRepository.findByNickNameStartsWith(props);
+        assertEquals(findMembers.size(),3);
     }
 }

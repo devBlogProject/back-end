@@ -1,5 +1,6 @@
 package com.multi.blogging.multiblogging.auth.service;
 
+import com.multi.blogging.multiblogging.auth.RandomNickNameProvider;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.enums.SocialType;
 import com.multi.blogging.multiblogging.auth.oAuth.CustomOAuth2User;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -84,7 +86,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         Member findMember = memberRepository.findBySocialTypeAndSocialId(socialType,
                 attributes.getOauth2UserInfo().getId()).orElse(null);
 
-        if(findMember == null) {
+        if (findMember == null) {
             return saveMember(attributes, socialType);
         }
         return findMember;
@@ -96,6 +98,11 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
      */
     private Member saveMember(OAuthAttributes attributes, SocialType socialType) {
         Member createdMember = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
+        if (memberRepository.existsByNickName(createdMember.getNickName())) { // 이미 닉네임이 존재하는 경우 랜덤 닉네임으로 설정
+            List<Member> startsWithNickNameMembers = memberRepository.findByNickNameStartsWith(createdMember.getNickName());
+            String randomNickName = RandomNickNameProvider.createRandomNickNameByMembers(createdMember.getNickName(), startsWithNickNameMembers);
+            createdMember.setNickName(randomNickName);
+        }
         return memberRepository.save(createdMember);
     }
 }
