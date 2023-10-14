@@ -12,6 +12,7 @@ services:
   nginx:
     container_name: nginx
     image: goldsergeant/nginx
+    platform: linux/amd64
     ports:
       - 80:80
     depends_on:
