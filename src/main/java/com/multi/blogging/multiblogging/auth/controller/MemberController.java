@@ -2,9 +2,11 @@ package com.multi.blogging.multiblogging.auth.controller;
 
 import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.service.MemberService;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,10 @@ public class MemberController {
         return ResponseEntity.ok(memberService.modifyNickName(modifyNickNameRequestDto));
     }
 
-    @PutMapping("/image")
-    public ResponseEntity<MemberResponseDto> updateProfileImage(@Valid @RequestBody UpdateProfileImageRequestDto updateProfileImageRequestDto){
+    @PutMapping(value="/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MemberResponseDto> updateProfileImage(
+            @Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
+            @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto){
         return ResponseEntity.ok(memberService.updateMemberProfileImage(updateProfileImageRequestDto));
     }
 

@@ -6,6 +6,7 @@ import com.multi.blogging.multiblogging.auth.dto.*;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.*;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
+import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageUploadService imageUploadService;
 
 
     @Transactional
@@ -62,8 +64,8 @@ public class MemberService {
     @Transactional
     public MemberResponseDto updateMemberProfileImage(UpdateProfileImageRequestDto dto){
         Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        member.setImageUrl(dto.imageUrl);
-
+        String imageUrl = imageUploadService.uploadFile(dto.getImage());
+        member.setImageUrl(imageUrl);
         return MemberResponseDto.of(member);
     }
 
@@ -104,4 +106,7 @@ public class MemberService {
     public boolean checkNickNameDuplicate(String nickName){
         return !memberRepository.existsByNickName(nickName);
     }
+
+
 }
+
