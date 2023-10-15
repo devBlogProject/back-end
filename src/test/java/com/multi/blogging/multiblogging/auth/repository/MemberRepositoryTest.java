@@ -1,10 +1,20 @@
 package com.multi.blogging.multiblogging.auth.repository;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.auth.repository.custom.CustomMemberRepository;
+import com.multi.blogging.multiblogging.auth.repository.custom.impl.CustomMemberRepositoryImpl;
+import com.multi.blogging.multiblogging.config.QueryDslTestConfig;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,12 +27,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @DataJpaTest
+@Import(QueryDslTestConfig.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+
     @Test
     void save(){
         Member member = Member.builder().email("test@test.com").password("1234").nickName("test").build();
