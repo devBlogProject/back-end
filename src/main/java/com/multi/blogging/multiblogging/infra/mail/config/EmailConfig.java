@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.mail.config;
+package com.multi.blogging.multiblogging.infra.mail.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

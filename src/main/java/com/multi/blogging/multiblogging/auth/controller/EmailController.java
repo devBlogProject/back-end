@@ -2,7 +2,6 @@ package com.multi.blogging.multiblogging.auth.controller;
 
 import com.multi.blogging.multiblogging.auth.dto.EmailVerificationResponseDto;
 import com.multi.blogging.multiblogging.auth.service.EmailService;
-import com.multi.blogging.multiblogging.redis.RedisService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;

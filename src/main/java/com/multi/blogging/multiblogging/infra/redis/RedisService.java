@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.redis;
+package com.multi.blogging.multiblogging.infra.redis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

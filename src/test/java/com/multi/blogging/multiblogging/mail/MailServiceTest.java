@@ -1,7 +1,7 @@
 package com.multi.blogging.multiblogging.mail;
 
 import com.multi.blogging.multiblogging.auth.service.EmailService;
-import com.multi.blogging.multiblogging.redis.RedisService;
+import com.multi.blogging.multiblogging.infra.redis.RedisService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

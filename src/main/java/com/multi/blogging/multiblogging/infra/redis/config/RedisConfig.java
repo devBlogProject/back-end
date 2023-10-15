@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.redis.config;
+package com.multi.blogging.multiblogging.infra.redis.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

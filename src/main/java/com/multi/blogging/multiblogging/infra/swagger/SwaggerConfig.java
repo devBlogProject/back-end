@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.swagger;
+package com.multi.blogging.multiblogging.infra.swagger;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
