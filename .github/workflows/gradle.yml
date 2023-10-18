@@ -24,7 +24,7 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v3
-1
+
     - name: Set environment variable from docker-compose-deploy.yaml
       run: echo "DOCKER_COMPOSE=$(cat docker-compose-deploy.yaml)" >> "$GITHUB_ENV"
       
