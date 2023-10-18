@@ -30,7 +30,7 @@ jobs:
       run: |
           echo 'DOCKER_COMPOSE<<EOF' >> $GITHUB_ENV
           cat docker-compose-deploy.yaml >> $GITHUB_ENV
-          echo 'EOF' >> "$GITHUB_ENV"
+          echo 'EOF' >> $GITHUB_ENV
       
     - name: Set up JDK 17
       uses: actions/setup-java@v3
