@@ -25,8 +25,9 @@ jobs:
     - name: checkout
       uses: actions/checkout@v3
 
-    - name: Set environment variable from docker-compose-deploy.yaml
-      run: echo "DOCKER_COMPOSE=$(cat docker-compose-deploy.yaml)" >> $GITHUB_ENV
+    - name: Get DOCKER_COMPOSE
+      id: vars
+      run: echo "DOCKER_COMPOSE=$(cat docker-compose-deploy.yaml)" >> $GITHUB_OUTPUT
       
     - name: Set up JDK 17
       uses: actions/setup-java@v3
@@ -87,7 +88,7 @@ jobs:
         script: |
           touch docker-compose.yaml
           truncate -s 0 docker-compose.yaml
-          echo "${{env.DOCKER_COMPOSE}}" > docker-compose.yaml
+          echo "${{ steps.vars.outputs.DOCKER_COMPOSE }}" > docker-compose.yaml
           sudo docker rm -f $(docker ps -qa)
           sudo docker pull ${{ secrets.DOCKER_REPO }}/web
           sudo docker pull ${{ secrets.DOCKER_REPO }}/nginx
