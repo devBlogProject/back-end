@@ -30,12 +30,7 @@ jobs:
         DOCKER_COMPOSE=$(cat docker-compose-deploy.yaml)
         echo "DOCKER_COMPOSE<<EOF" >> $GITHUB_ENV
         echo "$DOCKER_COMPOSE" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-
-    - name: display string
-      run: |
-        echo "The string is: ${{ env.DOCKER_COMPOSE }}"
-    
+        echo "EOF" >> $GITHUB_ENV  
 
     - name: Set up JDK 17
       uses: actions/setup-java@v3
