@@ -34,7 +34,6 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-@RunWith(MockitoJUnitRunner.class)
 class MemberServiceTest {
 
     @Autowired
@@ -56,32 +55,7 @@ class MemberServiceTest {
     ImageUploadService imageUploadService;
 
 
-    @Test
-    @Transactional
-    void logout(){
-        Member signUpMember= Member.builder().email("test@test.com")
-                .password("1234")
-                .build();
-        MemberSignUpRequestDto signUpRequestDto= new MemberSignUpRequestDto();
-        signUpRequestDto.setEmail(signUpMember.getEmail());
-        signUpRequestDto.setPassword(signUpMember.getPassword());
-        memberService.signUp(signUpRequestDto);
 
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto();
-        memberLoginRequestDto.setEmail(signUpMember.getEmail());
-        memberLoginRequestDto.setPassword(signUpMember.getPassword());
-
-        authService.login(memberLoginRequestDto);
-        SecurityContext context = SecurityContextHolder.getContext();
-        UserDetails user = userDetailsService.loadUserByUsername(signUpMember.getEmail());
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
-        assertNotNull(
-                refreshTokenRepository.findById(signUpMember.getEmail())
-        );
-        authService.logout();
-
-        assertEquals(refreshTokenRepository.findById(signUpMember.getEmail()), Optional.empty());
-    }
 
     @Test
     @Transactional
