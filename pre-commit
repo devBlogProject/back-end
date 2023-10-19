@@ -1,11 +1,13 @@
-#!/bin/bash
+ #!/bin/sh
+ set -e
+ ######## RUN UNIT TEST HOOK START ########
+ git stash -q --keep-index
 
-echo "Running git pre-commit hook"
+ ./gradlew test
 
-./gradlew clean build
+ RESULT=$?
 
-RESULT=$?
+ git stash pop -q
 
-# return 1 exit code if running checks fails
-[ $RESULT -ne 0 ] && exit 1
-exit 0
+ exit $RESULT
+ ######## RUN UNIT TEST HOOK END ########
