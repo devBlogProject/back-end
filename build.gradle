@@ -62,7 +62,7 @@ def querydslSrcDir = 'src/main/generated'
 sourceSets {
     main {
         java {
-            srcDirs += [ querydslSrcDir ]
+            srcDirs += [querydslSrcDir]
         }
     }
 }
@@ -88,4 +88,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-apply from: "$projectDir/gradle/preCommit.gradle"
+task installGitHook(type: Copy) {
+    from new File(projectDir, 'pre-commit')
+    into { new File(projectDir, '.git/hooks') }
+    fileMode 0777
+}

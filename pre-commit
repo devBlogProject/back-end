@@ -1,13 +1,15 @@
- #!/bin/sh
- set -e
- ######## RUN UNIT TEST HOOK START ########
- git stash -q --keep-index
+#!/bin/sh
 
- ./gradlew test
+echo "*****Running unit tests******"
 
- RESULT=$?
+git stash -q --keep-index
 
- git stash pop -q
+./gradlew test
 
- exit $RESULT
- ######## RUN UNIT TEST HOOK END ########
+status=$?
+
+git stash pop -q
+
+echo "*****Done with unit tests******"
+
+exit $status
