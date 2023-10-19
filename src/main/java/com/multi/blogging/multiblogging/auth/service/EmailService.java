@@ -7,7 +7,7 @@ import com.multi.blogging.multiblogging.auth.exception.MailCodeNotMatchingExcept
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.exception.SocialMemberDuplicateException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
-import com.multi.blogging.multiblogging.infra.redis.RedisService;
+import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
 import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;

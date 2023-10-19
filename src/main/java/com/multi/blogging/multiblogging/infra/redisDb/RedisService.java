@@ -1,5 +1,4 @@
-package com.multi.blogging.multiblogging.infra.redis;
-
+package com.multi.blogging.multiblogging.infra.redisDb;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
