@@ -28,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @DataJpaTest
 @Import(QueryDslTestConfig.class)
-@TestPropertySource(locations = "classpath:application-test.properties")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MemberRepositoryTest {
 
@@ -50,6 +49,8 @@ class MemberRepositoryTest {
         assertEquals(member_cal.get(Calendar.YEAR),now_cal.get(Calendar.YEAR) );
         assertEquals(member_cal.get(Calendar.DAY_OF_MONTH),now_cal.get(Calendar.DAY_OF_MONTH) );
         assertEquals(member_cal.get(Calendar.HOUR),now_cal.get(Calendar.HOUR) );
+
+        throw new RuntimeException();
     }
 
     @Test
