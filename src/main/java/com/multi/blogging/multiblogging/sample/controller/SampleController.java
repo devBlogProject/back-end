@@ -9,8 +9,6 @@ public class SampleController {
 
     @GetMapping("/sample")
     public String sample(){
-        throw new EmailDuplicateException();
-
-//        return "sample test";
+        return "sample test";
     }
 }
