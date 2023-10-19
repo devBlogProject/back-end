@@ -50,7 +50,6 @@ class MemberRepositoryTest {
         assertEquals(member_cal.get(Calendar.DAY_OF_MONTH),now_cal.get(Calendar.DAY_OF_MONTH) );
         assertEquals(member_cal.get(Calendar.HOUR),now_cal.get(Calendar.HOUR) );
 
-        throw new RuntimeException();
     }
 
     @Test
