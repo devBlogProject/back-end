@@ -80,6 +80,7 @@ class AuthServiceTest {
        setAuthentication();
 
        Thread.sleep(1000);
+
         TokenDto reIssuedTokenDto = authService.reIssue(tokenDto.getRefreshToken());
 
         assertNotEquals(tokenDto.getAccessToken(), reIssuedTokenDto.getAccessToken());
