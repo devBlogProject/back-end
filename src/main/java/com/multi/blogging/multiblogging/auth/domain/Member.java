@@ -3,12 +3,14 @@ package com.multi.blogging.multiblogging.auth.domain;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.enums.SocialType;
 import com.multi.blogging.multiblogging.base.domain.BaseEntity;
+import com.multi.blogging.multiblogging.board.domain.Board;
+import com.multi.blogging.multiblogging.category.domain.Category;
+import com.multi.blogging.multiblogging.comment.domain.Comment;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +42,15 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType; // KAKAO, NAVER, GOOGLE
 
+    @OneToMany(mappedBy = "member")
+    private List<Board> boardList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Category> categories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Comment> commentList = new ArrayList<>();
+
     @Builder
     public Member(String email, String password, String nickName, Authority authority,SocialType socialType,String socialId,String imageUrl) {
         this.email =email;
@@ -51,7 +62,7 @@ public class Member extends BaseEntity {
         this.imageUrl=imageUrl;
     }
 
-    public Member() {
+    protected Member() {
 
     }
 

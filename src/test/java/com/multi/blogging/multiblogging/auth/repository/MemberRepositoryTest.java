@@ -63,6 +63,7 @@ class MemberRepositoryTest {
         Member newMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
 
         assertNotEquals(originalUpdatedDate,newMember.getUpdatedDate());
+
     }
 
     @Test
