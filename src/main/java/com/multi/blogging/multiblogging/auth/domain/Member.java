@@ -2,6 +2,7 @@ package com.multi.blogging.multiblogging.auth.domain;
 
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.enums.SocialType;
+import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,7 +14,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +35,6 @@ public class Member {
     @Column(name = "member_role")
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
-    @CreationTimestamp
-    private Timestamp createDate;
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
     @Enumerated(EnumType.STRING)

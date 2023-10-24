@@ -1,5 +1,6 @@
-package com.multi.blogging.multiblogging.auth.config;
+package com.multi.blogging.multiblogging.base.config;
 
+import com.multi.blogging.multiblogging.auth.config.JwtSecurityConfig;
 import com.multi.blogging.multiblogging.auth.jwt.JwtAccessDeniedHandler;
 import com.multi.blogging.multiblogging.auth.jwt.JwtAuthenticationEntryPoint;
 import com.multi.blogging.multiblogging.auth.jwt.TokenProvider;
