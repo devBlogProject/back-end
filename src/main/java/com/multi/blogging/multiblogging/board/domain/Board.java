@@ -14,7 +14,7 @@ public class Board {
     private String title;
 
     @Column(nullable = false, length = 10000)
-    private Object content;
+    private String content;
 
     @Column(nullable = false)
     private String thumbnailUrl;
