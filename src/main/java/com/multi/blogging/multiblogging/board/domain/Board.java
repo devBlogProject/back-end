@@ -1,18 +1,21 @@
 package com.multi.blogging.multiblogging.board.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
 public class Board {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_id")
-    Long id;
+    @Column(name = "article_id")
+    private Long id;
 
+    @Column(nullable = false, length = 50)
+    private String title;
 
+    @Column(nullable = false, length = 10000)
+    private Object content;
 
+    @Column(nullable = false)
+    private String thumbnailUrl;
 }
