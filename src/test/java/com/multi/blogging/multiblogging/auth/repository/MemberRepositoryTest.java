@@ -41,15 +41,28 @@ class MemberRepositoryTest {
         assertTrue(memberRepository.findAll().isEmpty());
         memberRepository.save(member);
         assertEquals(memberRepository.findAll().toArray().length,1);
+    }
 
-        Calendar member_cal =Calendar.getInstance();
-        member_cal.setTimeInMillis(member.getCreateDate().getTime());
-        Calendar now_cal = Calendar.getInstance();
-        now_cal.setTime(new Date());
-        assertEquals(member_cal.get(Calendar.YEAR),now_cal.get(Calendar.YEAR) );
-        assertEquals(member_cal.get(Calendar.DAY_OF_MONTH),now_cal.get(Calendar.DAY_OF_MONTH) );
-        assertEquals(member_cal.get(Calendar.HOUR),now_cal.get(Calendar.HOUR) );
+    @Test
+    void memberAuditingTest(){
+        String testEmail="test@test.com";
+        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        memberRepository.save(member);
 
+        Member findMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
+
+
+        assertNotNull(findMember.getCreatedDate());
+        assertNotNull(findMember.getUpdatedDate());
+
+
+        var originalUpdatedDate = findMember.getUpdatedDate();
+        findMember.setNickName("test1");
+        memberRepository.save(findMember);
+
+        Member newMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
+
+        assertNotEquals(originalUpdatedDate,newMember.getUpdatedDate());
     }
 
     @Test

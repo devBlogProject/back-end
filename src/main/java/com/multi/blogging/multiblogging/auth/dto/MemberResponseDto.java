@@ -5,7 +5,8 @@ import com.multi.blogging.multiblogging.auth.enums.Authority;
 import lombok.Builder;
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 
 @Data
 @Builder
@@ -16,7 +17,9 @@ public class MemberResponseDto {
 
     private Authority authority;
 
-    private Timestamp createDate;
+    private LocalDateTime createdDate;
+
+    private LocalDateTime updatedDate;
 
     private String imageUrl;
 
@@ -25,7 +28,8 @@ public class MemberResponseDto {
                 .email(member.getEmail())
                 .nickName(member.getNickName())
                 .authority(member.getAuthority())
-                .createDate(member.getCreateDate())
+                .createdDate(member.getCreatedDate())
+                .updatedDate(member.getUpdatedDate())
                 .imageUrl(member.getImageUrl())
                 .build();
     }
