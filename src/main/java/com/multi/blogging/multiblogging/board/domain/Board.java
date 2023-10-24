@@ -7,7 +7,7 @@ public class Board {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "article_id")
+    @Column(name = "board_id")
     private Long id;
 
     @Column(nullable = false, length = 50)
