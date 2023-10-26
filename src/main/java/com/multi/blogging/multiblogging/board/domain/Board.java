@@ -61,6 +61,16 @@ public class Board {
         return thumbnailUrl;
     }
 
+    public void changeMember(Member member){
+        this.member=member;
+        member.getBoardList().add(this);
+    }
+
+    public void changeCategory(Category category){
+        this.category = category;
+        category.getBoardList().add(this);
+    }
+
 
     protected Board(){}
 }

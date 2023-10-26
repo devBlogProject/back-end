@@ -8,4 +8,6 @@ public class BoardRequestDto {
     @NotBlank(message = "제목을 작성해주세요.")
     private String title;
 
+    @NotBlank(message = "내용을 작성해주세요.")
+    private String content;
 }
