@@ -26,7 +26,9 @@ public class EmailController {
     @GetMapping("/verifications")
     public ApiResponse<EmailVerificationResponseDto> verifyEmail(@RequestParam("email") @Valid @Email String email,
                                                                     @RequestParam("code") String authCode) {
-
-        return ApiResponse.createSuccess(emailService.verifiedCode(email,authCode));
+        String temporaryPassword=emailService.verifiedCode(email,authCode);
+        EmailVerificationResponseDto dto=new EmailVerificationResponseDto();
+        dto.setTemporaryPassword(temporaryPassword);
+        return ApiResponse.createSuccess(dto);
     }
 }
