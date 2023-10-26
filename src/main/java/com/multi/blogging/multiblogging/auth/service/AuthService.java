@@ -27,11 +27,10 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
 
 
-    public String logout() {
+    public void logout() {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(email);
         refreshToken.ifPresent(refreshTokenRepository::delete);
-        return "로그아웃 되었습니다.";
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package com.multi.blogging.multiblogging.auth.controller;
 
 import com.multi.blogging.multiblogging.auth.dto.response.EmailVerificationResponseDto;
 import com.multi.blogging.multiblogging.auth.service.EmailService;
+import com.multi.blogging.multiblogging.base.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +19,16 @@ public class EmailController {
 
     private final EmailService emailService;
     @PostMapping("/verification-requests")
-    public ResponseEntity<Void> sendMessage(@RequestParam("email") @Valid @Email(message = "이메일 형식으로 입력해주세요.") String email) throws Exception {
+    public ApiResponse<?> sendMessage(@RequestParam("email") @Valid @Email(message = "이메일 형식으로 입력해주세요.") String email) throws Exception {
         String code = emailService.createCode();
         emailService.sendAuthCodeEmail(email,"Multiblogging 인증코드",code);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ApiResponse.createSuccessWithNoContent();
     }
 
     @GetMapping("/verifications")
-    public ResponseEntity<EmailVerificationResponseDto> verifyEmail(@RequestParam("email") @Valid @Email String email,
+    public ApiResponse<EmailVerificationResponseDto> verifyEmail(@RequestParam("email") @Valid @Email String email,
                                                                     @RequestParam("code") String authCode) {
-        return ResponseEntity.ok(emailService.verifiedCode(email,authCode));
+
+        return ApiResponse.createSuccess(emailService.verifiedCode(email,authCode));
     }
 }

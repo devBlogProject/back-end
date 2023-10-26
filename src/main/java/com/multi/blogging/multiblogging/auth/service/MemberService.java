@@ -30,7 +30,7 @@ public class MemberService {
 
 
     @Transactional
-    public MemberResponseDto modifyNickName(ModifyNickNameRequestDto dto) {
+    public Member modifyNickName(ModifyNickNameRequestDto dto) {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
@@ -40,7 +40,7 @@ public class MemberService {
             throw new NickNameDuplicateException();
         }
         member.get().setNickName(dto.getNickName());
-        return MemberResponseDto.of(member.get());
+        return member.get();
     }
 
     @Transactional
@@ -56,26 +56,26 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponseDto getMemberProfile() {
+    public Member getMemberProfile() {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        return MemberResponseDto.of(member.get());
+        return member.get();
     }
 
     @Transactional
-    public MemberResponseDto updateMemberProfileImage(UpdateProfileImageRequestDto dto){
+    public Member updateMemberProfileImage(UpdateProfileImageRequestDto dto){
         Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         String imageUrl = imageUploadService.uploadFile(dto.getImage());
         member.setImageUrl(imageUrl);
-        return MemberResponseDto.of(member);
+        return member;
     }
 
 
     @Transactional
-    public MemberResponseDto signUp(MemberSignUpRequestDto dto) {
+    public Member signUp(MemberSignUpRequestDto dto) {
         Member findMember = memberRepository.findOneByEmail(dto.getEmail()).orElse(null);
         if (findMember!=null) {
             log.debug("MemberService.singUp EmailDuplicatedException occur dto.email: {}", dto.getEmail());
@@ -99,7 +99,7 @@ public class MemberService {
 
         memberRepository.save(member);
 
-        return MemberResponseDto.of(member);
+        return member;
     }
 
 
