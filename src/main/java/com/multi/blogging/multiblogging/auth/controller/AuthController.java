@@ -1,15 +1,13 @@
 package com.multi.blogging.multiblogging.auth.controller;
 
-import com.multi.blogging.multiblogging.auth.dto.MemberLoginRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberLoginRequestDto;
 import com.multi.blogging.multiblogging.auth.dto.TokenDto;
-import com.multi.blogging.multiblogging.auth.dto.TokenReIssueRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.TokenReIssueRequestDto;
 import com.multi.blogging.multiblogging.auth.jwt.TokenProvider;
 import com.multi.blogging.multiblogging.auth.service.AuthService;
-import com.multi.blogging.multiblogging.auth.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;

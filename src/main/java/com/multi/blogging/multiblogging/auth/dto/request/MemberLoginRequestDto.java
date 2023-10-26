@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.auth.dto;
+package com.multi.blogging.multiblogging.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

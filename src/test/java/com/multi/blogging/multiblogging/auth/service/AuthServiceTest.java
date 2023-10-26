@@ -1,8 +1,8 @@
 package com.multi.blogging.multiblogging.auth.service;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
-import com.multi.blogging.multiblogging.auth.dto.MemberLoginRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.MemberSignUpRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberLoginRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
 import com.multi.blogging.multiblogging.auth.dto.TokenDto;
 import com.multi.blogging.multiblogging.auth.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.nio.file.AccessDeniedException;
 import java.util.Optional;

@@ -61,4 +61,6 @@ public class Board {
         return thumbnailUrl;
     }
 
+
+    protected Board(){}
 }

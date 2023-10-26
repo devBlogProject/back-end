@@ -1,6 +1,10 @@
 package com.multi.blogging.multiblogging.auth.controller;
 
-import com.multi.blogging.multiblogging.auth.dto.*;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.ModifyNickNameRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.ModifyPasswordRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.UpdateProfileImageRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.response.MemberResponseDto;
 import com.multi.blogging.multiblogging.auth.service.MemberService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;

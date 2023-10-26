@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.auth.dto;
+package com.multi.blogging.multiblogging.auth.dto.response;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.enums.Authority;

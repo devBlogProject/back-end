@@ -1,18 +1,13 @@
 package com.multi.blogging.multiblogging.auth.service;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
-import com.multi.blogging.multiblogging.auth.dto.MemberLoginRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.MemberSignUpRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.UpdateProfileImageRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.UpdateProfileImageRequestDto;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.auth.repository.RefreshTokenRepository;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
