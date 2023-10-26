@@ -1,6 +1,6 @@
 package com.multi.blogging.multiblogging.auth.service;
 
-import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.dto.response.EmailVerificationResponseDto;
 import com.multi.blogging.multiblogging.auth.exception.MailCodeNotMatchingException;

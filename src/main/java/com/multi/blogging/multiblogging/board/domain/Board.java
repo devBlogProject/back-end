@@ -1,6 +1,7 @@
 package com.multi.blogging.multiblogging.board.domain;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.comment.domain.Comment;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Board {
+public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

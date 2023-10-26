@@ -1,6 +1,7 @@
 package com.multi.blogging.multiblogging.category.domain;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -10,13 +11,13 @@ import java.util.List;
 
 @Entity
 @Getter
-public class Category {
+public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, length = 20)
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,11 +33,20 @@ public class Category {
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
-    private List<Category> children = new ArrayList<>();
+    private List<Category> childrenCategories = new ArrayList<>();
 
-    public Category(String title,Category parent){
+    public Category(String title,Member member){
         this.title=title;
+        changeMember(member);
+    }
+
+    public void changeMember(Member member){
+        this.member = member;
+        member.getCategories().add(this);
+    }
+    public void changeParentCategory(Category parent){
         this.parent=parent;
+        parent.getChildrenCategories().add(this);
     }
 
     protected Category(){}

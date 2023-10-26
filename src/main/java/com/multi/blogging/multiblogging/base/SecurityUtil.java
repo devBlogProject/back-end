@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.auth;
+package com.multi.blogging.multiblogging.base;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

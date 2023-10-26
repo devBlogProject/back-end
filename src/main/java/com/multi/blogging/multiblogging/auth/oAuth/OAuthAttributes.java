@@ -1,6 +1,6 @@
 package com.multi.blogging.multiblogging.auth.oAuth;
 
-import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.enums.SocialType;
@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 public class OAuthAttributes {

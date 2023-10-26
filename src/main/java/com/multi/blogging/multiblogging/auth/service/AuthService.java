@@ -1,6 +1,6 @@
 package com.multi.blogging.multiblogging.auth.service;
 
-import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.RefreshToken;
 import com.multi.blogging.multiblogging.auth.dto.request.MemberLoginRequestDto;
 import com.multi.blogging.multiblogging.auth.dto.TokenDto;
