@@ -4,7 +4,6 @@ import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
-import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
@@ -50,6 +49,12 @@ public class CategoryService {
         category.changeParentCategory(parentCategory);
 
         return categoryRepository.save(category);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Category> getMyTopCategories(){
+        var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+        return categoryRepository.findAllTopCategoriesWithMember(member);
     }
 
     private boolean isDuplicate(List<Category> categories, String title){

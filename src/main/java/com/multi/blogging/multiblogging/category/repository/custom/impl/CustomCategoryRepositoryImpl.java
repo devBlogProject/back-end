@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.multi.blogging.multiblogging.category.domain.QCategory.category;
@@ -30,5 +31,17 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
                         .and(category.member.eq(member))
                 ).fetchOne());
 
+    }
+
+    @Override
+    public List<Category> findAllTopCategoriesWithMember(Member member) {
+        return queryFactory
+                .selectFrom(category)
+                .from(category, QMember.member)
+                .where(
+                        category.member.eq(member)
+                        .and(category.parent.isNull())
+                )
+                .fetch();
     }
 }

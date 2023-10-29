@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/category")
 @RequiredArgsConstructor
@@ -26,6 +28,12 @@ public class CategoryController {
     public ApiResponse<CategoryResponseDto> writeChildCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("parent_id")Long parentCategoryId ){
         Category category = categoryService.addChildCategory(requestDto.getTitle(),parentCategoryId);
         return ApiResponse.createSuccess(CategoryResponseDto.of(category));
+    }
+
+    @GetMapping("/all")
+    public ApiResponse<List<CategoryResponseDto>> getMyCategories(){
+        List<Category> categories = categoryService.getMyTopCategories();
+        return ApiResponse.createSuccess(categories.stream().map(CategoryResponseDto::of).toList());
     }
 
 }

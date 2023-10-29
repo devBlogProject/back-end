@@ -17,7 +17,7 @@ public class CategoryResponseDto {
 
 //    private List<Board> boards = new ArrayList<>();
 
-    private List<Category> childrenCategories = new ArrayList<>();
+    private List<Category> childrenCategories;
 
 
     @Builder
