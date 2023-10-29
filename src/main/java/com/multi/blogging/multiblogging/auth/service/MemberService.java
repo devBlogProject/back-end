@@ -10,6 +10,7 @@ import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.*;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,17 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageUploadService imageUploadService;
+
+//    @PostConstruct //테스트 유저 생성
+//    private void addTestMember(){
+//        Member member = Member.builder()
+//                .email("test@test.com")
+//                .password(passwordEncoder.encode("1234"))
+//                .nickName("test_nick")
+//                .authority(Authority.ADMIN)
+//                .build();
+//        memberRepository.save(member);
+//    }
 
 
     @Transactional

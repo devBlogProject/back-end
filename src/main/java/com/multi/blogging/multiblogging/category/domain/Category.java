@@ -25,7 +25,7 @@ public class Category extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "category")
-    private List<Board> boardList = new ArrayList<>();
+    private List<Board> boards = new ArrayList<>();
 
     // 셀프조인
     @ManyToOne(fetch = FetchType.LAZY)

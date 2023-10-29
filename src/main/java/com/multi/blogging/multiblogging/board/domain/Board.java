@@ -69,7 +69,7 @@ public class Board extends BaseEntity {
 
     public void changeCategory(Category category){
         this.category = category;
-        category.getBoardList().add(this);
+        category.getBoards().add(this);
     }
 
 
