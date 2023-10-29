@@ -96,9 +96,7 @@ public class MemberService {
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .build();
 
-        memberRepository.save(member);
-
-        return member;
+        return memberRepository.save(member);
     }
 
 

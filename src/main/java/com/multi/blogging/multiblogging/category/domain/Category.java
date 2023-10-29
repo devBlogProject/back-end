@@ -32,7 +32,7 @@ public class Category extends BaseEntity {
     @JoinColumn(name = "parent_id")
     private Category parent;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Category> childrenCategories = new ArrayList<>();
 
     public Category(String title,Member member){

@@ -9,5 +9,4 @@ public class CategoryRequestDto {
     @NotBlank(message = "카테고리명을 입력해주세요.")
     private String title;
 
-    private String parentCategoryTitle;
 }
