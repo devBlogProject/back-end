@@ -27,15 +27,17 @@ class CategoryRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    private final static String testEmail = "test@test.com";
     @BeforeEach
     void setUp(){
         memberRepository.save(Member.builder()
-                .email("test@test.com").password("1234").build());
+                .email(testEmail).password("1234").build());
     }
 
     @Test
     void findByTitle() {
-        var member = memberRepository.findOneByEmail("test@test.com").orElseThrow();
+        var member = memberRepository.findOneByEmail(testEmail).orElseThrow();
         Category category = new Category("test", member);
         Category category1 = new Category("test1", member);
 
@@ -47,6 +49,28 @@ class CategoryRepositoryTest {
         assertTrue(categoryRepository.findByTitle("test1").isPresent());
         assertFalse(categoryRepository.findByTitle("test2").isPresent());
 
+    }
+
+
+    @Test
+    void findByIdWithMember(){
+        var existedMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
+
+        Member newMember = Member.builder().email("new@new.com").password("1234").build();
+        newMember = memberRepository.save(newMember);
+
+        Category category1 = new Category("test", existedMember);
+        Category category2 = new Category("test1", newMember);
+
+        category1=categoryRepository.save(category1);
+        category2=categoryRepository.save(category2);
+
+
+        assertTrue(categoryRepository.findByIdWithMember(existedMember,category1.getId()).isPresent());
+        assertTrue(categoryRepository.findByIdWithMember(newMember,category2.getId()).isPresent());
+
+        assertFalse(categoryRepository.findByIdWithMember(existedMember,category2.getId()).isPresent());
+        assertFalse(categoryRepository.findByIdWithMember(newMember,category1.getId()).isPresent());
     }
 
 }
