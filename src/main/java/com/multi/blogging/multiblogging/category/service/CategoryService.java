@@ -4,6 +4,7 @@ import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
+import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
@@ -23,7 +24,8 @@ public class CategoryService {
     @Transactional
     public Category addTopCategory(String title) {
         var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        if (isDuplicate(member.getCategories(),title)) {
+        List<Category> topCategories= member.getCategories().stream().filter(category -> category.getParent()==null).toList();
+        if (isDuplicate(topCategories,title)) {
             throw new CategoryDuplicateException();
         }
 
@@ -56,6 +58,11 @@ public class CategoryService {
         var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         return categoryRepository.findAllTopCategoriesWithMember(member);
     }
+
+//    @Transactional(readOnly = true)
+//    public Category updateCategory(CategoryRequestDto requestDto,){
+//        var category = categoryRepository.findById()
+//    }
 
     private boolean isDuplicate(List<Category> categories, String title){
         return categories.stream().filter(category -> category.getTitle().equals(title)).toList().size() != 0;
