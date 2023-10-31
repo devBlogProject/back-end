@@ -59,10 +59,16 @@ public class CategoryService {
         return categoryRepository.findAllTopCategoriesWithMember(member);
     }
 
-//    @Transactional(readOnly = true)
-//    public Category updateCategory(CategoryRequestDto requestDto,){
-//        var category = categoryRepository.findById()
-//    }
+    @Transactional()
+    public Category updateCategory(String title,Long categoryId){
+        var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+        if (!category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
+            throw new CategoryNotFoundException();
+        }
+
+        category.setTitle(title);
+        return category;
+    }
 
     private boolean isDuplicate(List<Category> categories, String title){
         return categories.stream().filter(category -> category.getTitle().equals(title)).toList().size() != 0;

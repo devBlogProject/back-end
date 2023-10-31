@@ -3,8 +3,10 @@ package com.multi.blogging.multiblogging.category.service;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.category.domain.Category;
+import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
+import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,9 @@ class CategoryServiceTest {
 
     @Autowired
     CategoryService categoryService;
+
+    @Autowired
+    CategoryRepository categoryRepository;
 
     @Autowired
     MemberRepository memberRepository;
@@ -50,6 +55,27 @@ class CategoryServiceTest {
         assertDoesNotThrow(() -> categoryService.addTopCategory("parent3"));
         assertDoesNotThrow(()->categoryService.addTopCategory("child"));
 
+    }
+
+    @Test
+    @WithMockUser(username = testEmail)
+    void 업데이트카테고리(){
+        Member anotherMember = Member.builder().email("test2@test.com").password("anything").build();
+        anotherMember=memberRepository.save(anotherMember);
+
+        Category parent1=categoryService.addTopCategory("parent1");
+        String oldTitle = parent1.getTitle();
+
+
+
+
+        categoryService.updateCategory("parent2", parent1.getId());
+        assertNotEquals(parent1.getTitle(),oldTitle);
+
+        Category parent2 = new Category("parent2", anotherMember);
+        Category savedParent2=categoryRepository.save(parent2);
+        assertThrows(CategoryNotFoundException.class, () ->
+                categoryService.updateCategory("parent3", savedParent2.getId()));
     }
 
     @Test

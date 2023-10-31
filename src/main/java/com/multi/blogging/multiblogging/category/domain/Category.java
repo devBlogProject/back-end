@@ -5,12 +5,13 @@ import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
+@Getter @Setter
 public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
