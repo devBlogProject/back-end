@@ -18,7 +18,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @PostMapping("/")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(description = "상위 카테고리 작성")
     public ApiResponse<CategoryResponseDto> writeTopCategory(@Valid @RequestBody CategoryRequestDto requestDto){
@@ -40,6 +40,7 @@ public class CategoryController {
     }
 
 //    @PatchMapping("/{category_id}")
-//    public ApiResponse<CategoryResponseDto> updateCategory()
+//    public ApiResponse<CategoryResponseDto> updateCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("category_id")Long categoryId){
+//    }
 
 }
