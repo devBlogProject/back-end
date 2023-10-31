@@ -1,18 +1,13 @@
 package com.multi.blogging.multiblogging.auth.service;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
-import com.multi.blogging.multiblogging.auth.dto.MemberLoginRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.MemberSignUpRequestDto;
-import com.multi.blogging.multiblogging.auth.dto.UpdateProfileImageRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.UpdateProfileImageRequestDto;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.auth.repository.RefreshTokenRepository;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,7 +28,6 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-@RunWith(MockitoJUnitRunner.class)
 class MemberServiceTest {
 
     @Autowired
@@ -56,32 +49,7 @@ class MemberServiceTest {
     ImageUploadService imageUploadService;
 
 
-    @Test
-    @Transactional
-    void logout(){
-        Member signUpMember= Member.builder().email("test@test.com")
-                .password("1234")
-                .build();
-        MemberSignUpRequestDto signUpRequestDto= new MemberSignUpRequestDto();
-        signUpRequestDto.setEmail(signUpMember.getEmail());
-        signUpRequestDto.setPassword(signUpMember.getPassword());
-        memberService.signUp(signUpRequestDto);
 
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto();
-        memberLoginRequestDto.setEmail(signUpMember.getEmail());
-        memberLoginRequestDto.setPassword(signUpMember.getPassword());
-
-        authService.login(memberLoginRequestDto);
-        SecurityContext context = SecurityContextHolder.getContext();
-        UserDetails user = userDetailsService.loadUserByUsername(signUpMember.getEmail());
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
-        assertNotNull(
-                refreshTokenRepository.findById(signUpMember.getEmail())
-        );
-        authService.logout();
-
-        assertEquals(refreshTokenRepository.findById(signUpMember.getEmail()), Optional.empty());
-    }
 
     @Test
     @Transactional

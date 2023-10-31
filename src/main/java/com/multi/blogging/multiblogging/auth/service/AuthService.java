@@ -1,8 +1,8 @@
 package com.multi.blogging.multiblogging.auth.service;
 
-import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.RefreshToken;
-import com.multi.blogging.multiblogging.auth.dto.MemberLoginRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberLoginRequestDto;
 import com.multi.blogging.multiblogging.auth.dto.TokenDto;
 import com.multi.blogging.multiblogging.auth.jwt.TokenProvider;
 import com.multi.blogging.multiblogging.auth.repository.RefreshTokenRepository;
@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.nio.file.AccessDeniedException;
 import java.util.Optional;
@@ -28,11 +27,10 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
 
 
-    public String logout() {
+    public void logout() {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(email);
         refreshToken.ifPresent(refreshTokenRepository::delete);
-        return "로그아웃 되었습니다.";
     }
 
     @Transactional

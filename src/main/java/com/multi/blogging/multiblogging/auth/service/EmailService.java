@@ -1,8 +1,8 @@
 package com.multi.blogging.multiblogging.auth.service;
 
-import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.Member;
-import com.multi.blogging.multiblogging.auth.dto.EmailVerificationResponseDto;
+import com.multi.blogging.multiblogging.auth.dto.response.EmailVerificationResponseDto;
 import com.multi.blogging.multiblogging.auth.exception.MailCodeNotMatchingException;
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.exception.SocialMemberDuplicateException;
@@ -61,7 +61,7 @@ public class EmailService {
     }
 
     @Transactional
-    public EmailVerificationResponseDto verifiedCode(String email, String authCode) {
+    public String verifiedCode(String email, String authCode) {
         String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
         if (!(redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode))) {
             throw new MailCodeNotMatchingException();
@@ -75,11 +75,9 @@ public class EmailService {
         }
         String temporaryPassword=SecurityUtil.createRamdomPassword(10);
         member.get().updatePassword(passwordEncoder,temporaryPassword);
-        EmailVerificationResponseDto emailVerificationResponseDto = new EmailVerificationResponseDto();
-        emailVerificationResponseDto.setTemporaryPassword(temporaryPassword);
         redisService.deleteValues(AUTH_CODE_PREFIX+email);
 
-        return emailVerificationResponseDto;
+        return temporaryPassword;
     }
 
     private MimeMessage createMessage(String toEmail,String title, String code) throws Exception{

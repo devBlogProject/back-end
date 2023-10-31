@@ -2,6 +2,8 @@ package com.multi.blogging.multiblogging.config;
 
 import com.multi.blogging.multiblogging.auth.repository.custom.CustomMemberRepository;
 import com.multi.blogging.multiblogging.auth.repository.custom.impl.CustomMemberRepositoryImpl;
+import com.multi.blogging.multiblogging.category.repository.custom.CustomCategoryRepository;
+import com.multi.blogging.multiblogging.category.repository.custom.impl.CustomCategoryRepositoryImpl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,5 +24,10 @@ public class QueryDslTestConfig {
     @Bean
     public CustomMemberRepository customMemberRepository(){
         return new CustomMemberRepositoryImpl(jpaQueryFactory());
+    }
+
+    @Bean
+    public CustomCategoryRepository customCategoryRepository(){
+        return new CustomCategoryRepositoryImpl(jpaQueryFactory());
     }
 }

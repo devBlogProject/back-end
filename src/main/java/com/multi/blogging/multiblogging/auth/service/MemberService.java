@@ -1,12 +1,16 @@
 package com.multi.blogging.multiblogging.auth.service;
 
-import com.multi.blogging.multiblogging.auth.SecurityUtil;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.auth.domain.Member;
-import com.multi.blogging.multiblogging.auth.dto.*;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.ModifyNickNameRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.ModifyPasswordRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.UpdateProfileImageRequestDto;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.exception.*;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,9 +28,20 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final ImageUploadService imageUploadService;
 
+//    @PostConstruct //테스트 유저 생성
+//    private void addTestMember(){
+//        Member member = Member.builder()
+//                .email("test@test.com")
+//                .password(passwordEncoder.encode("1234"))
+//                .nickName("test_nick")
+//                .authority(Authority.ADMIN)
+//                .build();
+//        memberRepository.save(member);
+//    }
+
 
     @Transactional
-    public MemberResponseDto modifyNickName(ModifyNickNameRequestDto dto) {
+    public Member modifyNickName(ModifyNickNameRequestDto dto) {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
@@ -36,7 +51,7 @@ public class MemberService {
             throw new NickNameDuplicateException();
         }
         member.get().setNickName(dto.getNickName());
-        return MemberResponseDto.of(member.get());
+        return member.get();
     }
 
     @Transactional
@@ -52,26 +67,26 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponseDto getMemberProfile() {
+    public Member getMemberProfile() {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        return MemberResponseDto.of(member.get());
+        return member.get();
     }
 
     @Transactional
-    public MemberResponseDto updateMemberProfileImage(UpdateProfileImageRequestDto dto){
+    public Member updateMemberProfileImage(UpdateProfileImageRequestDto dto){
         Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         String imageUrl = imageUploadService.uploadFile(dto.getImage());
         member.setImageUrl(imageUrl);
-        return MemberResponseDto.of(member);
+        return member;
     }
 
 
     @Transactional
-    public MemberResponseDto signUp(MemberSignUpRequestDto dto) {
+    public Member signUp(MemberSignUpRequestDto dto) {
         Member findMember = memberRepository.findOneByEmail(dto.getEmail()).orElse(null);
         if (findMember!=null) {
             log.debug("MemberService.singUp EmailDuplicatedException occur dto.email: {}", dto.getEmail());
@@ -93,9 +108,7 @@ public class MemberService {
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .build();
 
-        memberRepository.save(member);
-
-        return MemberResponseDto.of(member);
+        return memberRepository.save(member);
     }
 
 

@@ -1,7 +1,13 @@
 package com.multi.blogging.multiblogging.auth.controller;
 
-import com.multi.blogging.multiblogging.auth.dto.*;
+import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.ModifyNickNameRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.ModifyPasswordRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.request.UpdateProfileImageRequestDto;
+import com.multi.blogging.multiblogging.auth.dto.response.MemberResponseDto;
 import com.multi.blogging.multiblogging.auth.service.MemberService;
+import com.multi.blogging.multiblogging.base.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,42 +24,47 @@ public class MemberController {
     private final MemberService memberService;
 
     @PutMapping("/nickname")
-    public ResponseEntity<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto){
-        return ResponseEntity.ok(memberService.modifyNickName(modifyNickNameRequestDto));
+    public ApiResponse<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto) {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto));
+        return ApiResponse.createSuccess(dto);
     }
 
-    @PutMapping(value="/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MemberResponseDto> updateProfileImage(
+    @PutMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResponse<MemberResponseDto> updateProfileImage(
             @Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
-            @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto){
-        return ResponseEntity.ok(memberService.updateMemberProfileImage(updateProfileImageRequestDto));
+            @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto) {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto));
+        return ApiResponse.createSuccess(dto);
     }
 
     @PutMapping("/password")
-    public ResponseEntity<String> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto){
+    public ApiResponse<?> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto) {
         memberService.modifyPassword(modifyPasswordRequestDto);
-        return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+        return ApiResponse.createSuccessWithNoContent();
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<MemberResponseDto> getMemberProfile(){
-        return ResponseEntity.ok(memberService.getMemberProfile());
+    public ApiResponse<MemberResponseDto> getMemberProfile() {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.getMemberProfile());
+        return ApiResponse.createSuccess(dto);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<MemberResponseDto> signup(
             @Valid @RequestBody MemberSignUpRequestDto memberSignUpRequestDto
-            ){
-        return new ResponseEntity<>(memberService.signUp(memberSignUpRequestDto), HttpStatus.CREATED);
+    ) {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.signUp(memberSignUpRequestDto));
+        return ApiResponse.createSuccess(dto);
     }
 
     @GetMapping("/email/{email}/exists")
-    public ResponseEntity<Boolean> checkEmailDuplicate(@PathVariable String email){
-        return ResponseEntity.ok(memberService.checkEmailDuplicate(email));
+    public ApiResponse<?> checkEmailDuplicate(@PathVariable String email) {
+        return ApiResponse.createSuccess(memberService.checkEmailDuplicate(email));
     }
 
     @GetMapping("/nickname/{nickname}/exists")
-    public ResponseEntity<Boolean> checkNickNameDuplicate(@PathVariable String nickname){
-        return ResponseEntity.ok(memberService.checkNickNameDuplicate(nickname));
+    public ApiResponse<?> checkNickNameDuplicate(@PathVariable String nickname) {
+        return ApiResponse.createSuccess(memberService.checkNickNameDuplicate(nickname));
     }
 }
