@@ -17,11 +17,11 @@ public class CategoryResponseDto {
 
 //    private List<Board> boards = new ArrayList<>();
 
-    private List<Category> childrenCategories;
+    private List<CategoryResponseDto> childrenCategories;
 
 
     @Builder
-    private CategoryResponseDto(Long id, String title,List<Category> childrenCategories){
+    private CategoryResponseDto(Long id, String title,List<CategoryResponseDto> childrenCategories){
         this.id = id;
         this.title = title;
         this.childrenCategories = childrenCategories;
@@ -30,7 +30,7 @@ public class CategoryResponseDto {
         return CategoryResponseDto.builder()
                 .id(category.getId())
                 .title(category.getTitle())
-                .childrenCategories(category.getChildrenCategories())
+                .childrenCategories(category.getChildrenCategories().stream().map(CategoryResponseDto::of).toList())
                 .build();
     }
 }

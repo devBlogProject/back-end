@@ -57,11 +57,11 @@ class CategoryControllerTest {
 
         List<Category> categories = categoryService.getMyTopCategories();
 
-//        assertDoesNotThrow(()->System.out.println(
-//                objectMapper.writeValueAsString(
-//                        categories.stream().map(CategoryResponseDto::of)
-//                )
-//                ));
+        assertDoesNotThrow(()->System.out.println(
+                objectMapper.writeValueAsString(
+                        categories.stream().map(CategoryResponseDto::of).toList()
+                )
+                ));
 
     }
 
