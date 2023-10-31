@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PutMapping("/nickname")
+    @PatchMapping("/nickname")
     public ApiResponse<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto) {
         MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto));
         return ApiResponse.createSuccess(dto);
     }
 
-    @PutMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MemberResponseDto> updateProfileImage(
             @Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
             @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto) {

@@ -1,5 +1,4 @@
 package com.multi.blogging.multiblogging.board.domain;
-
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.category.domain.Category;
@@ -24,6 +23,7 @@ public class Board extends BaseEntity {
     private String title;
 
     @Column(nullable = false, length = 10000)
+
     private String content;
 
     @Column(nullable = false)
