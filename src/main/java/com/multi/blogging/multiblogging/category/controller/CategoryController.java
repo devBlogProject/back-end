@@ -41,6 +41,7 @@ public class CategoryController {
 
 //    @PatchMapping("/{category_id}")
 //    public ApiResponse<CategoryResponseDto> updateCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("category_id")Long categoryId){
+//
 //    }
 
 }
