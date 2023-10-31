@@ -39,14 +39,16 @@ class CategoryServiceTest {
     @Test
     @WithMockUser(username = testEmail)
     void addTopCategory() {
-        categoryService.addTopCategory("parent1");
+        Category parent1=categoryService.addTopCategory("parent1");
         categoryService.addTopCategory("parent2");
 
+        categoryService.addChildCategory(parent1.getId(),"child");
         assertThrows(CategoryDuplicateException.class, () ->
                 categoryService.addTopCategory("parent1")
         );
 
         assertDoesNotThrow(() -> categoryService.addTopCategory("parent3"));
+        assertDoesNotThrow(()->categoryService.addTopCategory("child"));
 
     }
 
@@ -54,7 +56,7 @@ class CategoryServiceTest {
     @WithMockUser(username = testEmail)
     void 없는부모_카테고리에_추가() {
         assertThrows(CategoryNotFoundException.class, () ->
-                categoryService.addChildCategory("child1", 1L)
+                categoryService.addChildCategory(1L, "child1")
         );
     }
 
@@ -63,20 +65,20 @@ class CategoryServiceTest {
     void 자식_카테고리_중복검사() {
         Category parentCategory=categoryService.addTopCategory("parent1");
 
-        categoryService.addChildCategory("child1", parentCategory.getId());
-        categoryService.addChildCategory("child2", parentCategory.getId());
+        categoryService.addChildCategory(parentCategory.getId(),"child1" );
+        categoryService.addChildCategory(parentCategory.getId(),"child2" );
 
-        assertThrows(CategoryDuplicateException.class, () -> categoryService.addChildCategory("child1", parentCategory.getId()));
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.addChildCategory( parentCategory.getId(),"child1"));
     }
 
     @Test
     @WithMockUser(username = testEmail)
     void 자식_자식_카테고리_중복검사() {
         Category parentCategory= categoryService.addTopCategory("parent1");
-        Category childCategory=categoryService.addChildCategory("child1", parentCategory.getId());
-        Category grandChildCategory=categoryService.addChildCategory("grand_child1", childCategory.getId());
+        Category childCategory=categoryService.addChildCategory( parentCategory.getId(),"child1");
+        Category grandChildCategory=categoryService.addChildCategory(childCategory.getId(),"grand_child1" );
 
         assertThrows(CategoryDuplicateException.class,
-                () -> categoryService.addChildCategory("grand_child1", childCategory.getId()));
+                () -> categoryService.addChildCategory(childCategory.getId(),"grand_child1"));
     }
 }

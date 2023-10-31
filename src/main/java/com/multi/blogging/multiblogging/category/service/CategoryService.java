@@ -36,7 +36,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category addChildCategory(String title, Long parentCategoryId) {
+    public Category addChildCategory(Long parentCategoryId,String title) {
         var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         Category parentCategory = categoryRepository.findById(parentCategoryId).orElseThrow(CategoryNotFoundException::new);
         if (parentCategory.getMember()!=member){

@@ -29,7 +29,7 @@ public class CategoryController {
     @PostMapping("/{parent_id}")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CategoryResponseDto> writeChildCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("parent_id")Long parentCategoryId ){
-        Category category = categoryService.addChildCategory(requestDto.getTitle(),parentCategoryId);
+        Category category = categoryService.addChildCategory(parentCategoryId,requestDto.getTitle());
         return ApiResponse.createSuccess(CategoryResponseDto.of(category));
     }
 

@@ -51,9 +51,9 @@ class CategoryControllerTest {
         Category parent3=categoryService.addTopCategory("parent3");
 
 
-        categoryService.addChildCategory("child1", parent1.getId());
-        categoryService.addChildCategory("child2", parent1.getId());
-        categoryService.addChildCategory("child3", parent1.getId());
+        categoryService.addChildCategory(parent1.getId(),"child1" );
+        categoryService.addChildCategory(parent1.getId(),"child2" );
+        categoryService.addChildCategory(parent1.getId(),"child3" );
 
         List<Category> categories = categoryService.getMyTopCategories();
 
