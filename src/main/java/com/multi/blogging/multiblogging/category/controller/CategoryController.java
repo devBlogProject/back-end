@@ -26,7 +26,7 @@ public class CategoryController {
         return ApiResponse.createSuccess(CategoryResponseDto.of(category));
     }
 
-    @PostMapping("/{parent_id}/")
+    @PostMapping("/{parent_id}")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<CategoryResponseDto> writeChildCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("parent_id")Long parentCategoryId ){
         Category category = categoryService.addChildCategory(requestDto.getTitle(),parentCategoryId);
@@ -39,6 +39,7 @@ public class CategoryController {
         return ApiResponse.createSuccess(categories.stream().map(CategoryResponseDto::of).toList());
     }
 
-
+//    @PatchMapping("/{category_id}")
+//    public ApiResponse<CategoryResponseDto> updateCategory()
 
 }
