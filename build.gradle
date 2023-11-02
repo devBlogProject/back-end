@@ -89,8 +89,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-task installGitHook(type: Copy) {
-    from new File(projectDir, 'pre-commit')
-    into { new File(projectDir, '.git/hooks') }
-    fileMode 0777
-}
+//task installGitHook(type: Copy) {
+//    from new File(projectDir, 'pre-commit')
+//    into { new File(projectDir, '.git/hooks') }
+//    fileMode 0777
+//}
