@@ -10,26 +10,33 @@ import com.multi.blogging.multiblogging.category.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
 import static com.multi.blogging.multiblogging.category.domain.QCategory.category;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
 class CategoryControllerTest {
 
@@ -45,6 +52,7 @@ class CategoryControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
 
     static Member member;
     static final String testEmail = "test@test.com";
@@ -93,5 +101,25 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.data.title").value("parent1"));
     }
 
+    @Test
+    @WithMockUser(username = testEmail)
+    void 고아객체_제거_테스트() throws Exception {
+        var parent=categoryService.addTopCategory("parent");
+        categoryService.addChildCategory(parent.getId(), "child1");
+        categoryService.addChildCategory(parent.getId(), "child2");
+        categoryService.addChildCategory(parent.getId(), "child3");
 
+        mockMvc.perform(delete("/category/{id}",parent.getId()))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        String uri = "/category/all";
+        mockMvc.perform(get(uri))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(0));
+
+
+
+    }
 }
