@@ -39,9 +39,10 @@ public class CategoryController {
         return ApiResponse.createSuccess(categories.stream().map(CategoryResponseDto::of).toList());
     }
 
-//    @PatchMapping("/{category_id}")
-//    public ApiResponse<CategoryResponseDto> updateCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("category_id")Long categoryId){
-//
-//    }
+    @PatchMapping("/{category_id}")
+    public ApiResponse<CategoryResponseDto> updateCategory(@Valid @RequestBody CategoryRequestDto requestDto, @PathVariable("category_id")Long categoryId){
+        Category updatedCategory = categoryService.updateCategory(requestDto.getTitle(), categoryId);
+        return ApiResponse.createSuccess(CategoryResponseDto.of(updatedCategory));
+    }
 
 }
