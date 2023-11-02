@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,6 +27,9 @@ class CategoryRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    private TestEntityManager em;
 
     private final static String testEmail = "test@test.com";
     @BeforeEach
@@ -100,5 +105,23 @@ class CategoryRepositoryTest {
         assertEquals(categoryRepository.findAllTopCategoriesWithMember(member1).size(),3);
         assertEquals(categoryRepository.findAllTopCategoriesWithMember(member2).size(),1);
     }
+
+//    @Test
+//    void 카테고리_고아객체_제거_테스트(){
+//        var member = memberRepository.findOneByEmail(testEmail).orElseThrow();
+//        Category parent = new Category("parent", member);
+//        parent=categoryRepository.save(parent);
+//
+//        Category childCategory1 = new Category("child1", member);
+//        Category childCategory2 = new Category("child2", member);
+//        Category childCategory3 = new Category("child3", member);
+//
+//        childCategory1.changeParentCategory(parent);
+//        childCategory2.changeParentCategory(parent);
+//        childCategory3.changeParentCategory(parent);
+//
+//        assertEquals(parent.getChildrenCategories().size(), 3);
+//
+//    }
 
 }
