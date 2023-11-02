@@ -5,6 +5,7 @@ import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
+import com.multi.blogging.multiblogging.category.exception.CategoryDeletePermissionDeniedException;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +61,7 @@ public class CategoryService {
         return categoryRepository.findAllTopCategoriesWithMember(member);
     }
 
-    @Transactional()
+    @Transactional
     public Category updateCategory(String title,Long categoryId){
         var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
         if (!category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
@@ -68,6 +70,18 @@ public class CategoryService {
 
         category.setTitle(title);
         return category;
+    }
+
+    @Transactional
+    public void deleteCategory(Long id){
+        Optional<Category> category = categoryRepository.findById(id);
+        if (category.isPresent()){
+            if (!category.get().getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
+                throw new CategoryDeletePermissionDeniedException();
+            }
+        }
+
+        categoryRepository.deleteById(id);
     }
 
     private boolean isDuplicate(List<Category> categories, String title){

@@ -45,4 +45,9 @@ public class CategoryController {
         return ApiResponse.createSuccess(CategoryResponseDto.of(updatedCategory));
     }
 
+    @DeleteMapping("/{category_id}")
+    public ApiResponse<?> deleteCategory(@PathVariable("category_id")Long categoryId){
+        categoryService.deleteCategory(categoryId);
+        return ApiResponse.createSuccessWithNoContent();
+    }
 }
