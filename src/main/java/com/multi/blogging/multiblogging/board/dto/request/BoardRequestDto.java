@@ -14,4 +14,8 @@ public class BoardRequestDto {
     @NotBlank(message = "내용을 작성해주세요.")
     private String content;
 
+    @NotBlank(message = "카테고리를 정해주세요.")
+    private Long categoryId;
+
+    MultipartFile thumbnailPicture;
 }

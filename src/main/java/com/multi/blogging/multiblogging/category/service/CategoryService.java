@@ -4,8 +4,7 @@ import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
-import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
-import com.multi.blogging.multiblogging.category.exception.CategoryDeletePermissionDeniedException;
+import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
@@ -77,7 +76,7 @@ public class CategoryService {
         Optional<Category> category = categoryRepository.findById(id);
         if (category.isPresent()){
             if (!category.get().getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
-                throw new CategoryDeletePermissionDeniedException();
+                throw new CategoryAccessPermissionDeniedException();
             }
         }
 
