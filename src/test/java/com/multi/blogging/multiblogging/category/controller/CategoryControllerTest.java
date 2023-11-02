@@ -119,7 +119,7 @@ class CategoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(0));
 
-
+        categoryRepository.deleteAll();
 
     }
 }

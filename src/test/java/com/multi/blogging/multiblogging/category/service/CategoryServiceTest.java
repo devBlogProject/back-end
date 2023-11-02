@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
-@Transactional
 class CategoryServiceTest {
 
     @Autowired
@@ -42,6 +41,7 @@ class CategoryServiceTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = testEmail)
     void addTopCategory() {
         Category parent1=categoryService.addTopCategory("parent1");
@@ -58,6 +58,7 @@ class CategoryServiceTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = testEmail)
     void 업데이트카테고리(){
         Member anotherMember = Member.builder().email("test2@test.com").password("anything").build();
@@ -79,6 +80,7 @@ class CategoryServiceTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = testEmail)
     void 없는부모_카테고리에_추가() {
         assertThrows(CategoryNotFoundException.class, () ->
@@ -87,6 +89,7 @@ class CategoryServiceTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = testEmail)
     void 자식_카테고리_중복검사() {
         Category parentCategory=categoryService.addTopCategory("parent1");
@@ -98,6 +101,7 @@ class CategoryServiceTest {
     }
 
     @Test
+    @Transactional
     @WithMockUser(username = testEmail)
     void 자식_자식_카테고리_중복검사() {
         Category parentCategory= categoryService.addTopCategory("parent1");
