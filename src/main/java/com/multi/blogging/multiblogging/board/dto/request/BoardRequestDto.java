@@ -2,6 +2,7 @@ package com.multi.blogging.multiblogging.board.dto.request;
 
 import com.multi.blogging.multiblogging.category.domain.Category;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,8 +15,7 @@ public class BoardRequestDto {
     @NotBlank(message = "내용을 작성해주세요.")
     private String content;
 
-    @NotBlank(message = "카테고리를 정해주세요.")
+    @NotNull(message = "카테고리를 정해주세요.")
     private Long categoryId;
 
-    MultipartFile thumbnailPicture;
 }

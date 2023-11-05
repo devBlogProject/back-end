@@ -24,6 +24,7 @@ import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
@@ -67,6 +68,7 @@ class MemberControllerTest {
 
         mockMvc.perform(builder.file(imageFile))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.imageUrl").value("http://image.file"));
+                .andExpect(jsonPath("$.data.imageUrl").value("http://image.file"))
+                .andDo(print());
     }
 }

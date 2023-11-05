@@ -25,29 +25,33 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final ImageUploadService imageUploadService;
-    static final String DEFAULT_THUMB_URL = "https://cdn.pixabay.com/photo/2020/11/08/13/28/tree-5723734_1280.jpg";
+    public static final String DEFAULT_THUMB_URL = "https://cdn.pixabay.com/photo/2020/11/08/13/28/tree-5723734_1280.jpg";
 
 
-    public Board writeBoard(Long categoryId,BoardRequestDto requestDto){
-        var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+
+    public Board writeBoard(BoardRequestDto requestDto,MultipartFile thumbNailImage){
+        var category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
         if (!hasAuthOfCategory(category)){
             throw new CategoryAccessPermissionDeniedException();
         }
         var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).get();
 
         String thumbnailUrl;
-        if (requestDto.getThumbnailPicture()!=null){
-        thumbnailUrl = imageUploadService.uploadFile(requestDto.getThumbnailPicture());
+        if (thumbNailImage!=null){
+        thumbnailUrl = imageUploadService.uploadFile(thumbNailImage);
+        }else{
+            thumbnailUrl = makeDefaultThumb(requestDto.getContent());
         }
 
         Board board = Board.builder()
                 .author(author)
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
-//                .thumbnailUrl(thumbnailUrl)
+                .thumbnailUrl(thumbnailUrl)
                 .category(category)
                 .build();
-    return board;  // !!! (수정필요, 커밋을 위해 임시로 만든 코드)
+
+    return boardRepository.save(board);
     }
 
     public String uploadImage(MultipartFile image){
@@ -57,18 +61,16 @@ public class BoardService {
     private boolean hasAuthOfCategory(Category category){
         return category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail());
     }
-    private String makeDefaultThumb(Board board,String content) {
+    private String makeDefaultThumb(String content) {
         Document doc = Jsoup.parse(content);
 
         // "img" 태그를 모두 선택합니다.
         Elements images = doc.select("img");
 
-        if ((board.getThumbnailUrl().isBlank())) {
-            if (images.isEmpty())
-                board.setThumbnailUrl(DEFAULT_THUMB_URL);
-            else
-                board.setThumbnailUrl(images.get(0).attr("img"));
-        }
-        return board.getThumbnailUrl();
+       if (images.isEmpty()){
+           return DEFAULT_THUMB_URL;
+       }else{
+           return images.get(0).attr("src");
+       }
     }
 }
