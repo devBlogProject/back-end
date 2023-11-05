@@ -15,6 +15,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +48,10 @@ public class BoardService {
                 .category(category)
                 .build();
     return board;  // !!! (수정필요, 커밋을 위해 임시로 만든 코드)
+    }
 
-
+    public String uploadImage(MultipartFile image){
+        return imageUploadService.uploadFile(image);
     }
 
     private boolean hasAuthOfCategory(Category category){
