@@ -17,6 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -32,17 +33,16 @@ class CategoryServiceTest {
     @Autowired
     MemberRepository memberRepository;
 
-    static final String testEmail = "test@test.com";
 
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(Member.builder().email(testEmail).password("1234").build());
+        memberRepository.save(Member.builder().email(TEST_EMAIL).password("1234").build());
     }
 
     @Test
     @Transactional
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     void addTopCategory() {
         Category parent1=categoryService.addTopCategory("parent1");
         categoryService.addTopCategory("parent2");
@@ -59,7 +59,7 @@ class CategoryServiceTest {
 
     @Test
     @Transactional
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     void 업데이트카테고리(){
         Member anotherMember = Member.builder().email("test2@test.com").password("anything").build();
         anotherMember=memberRepository.save(anotherMember);
@@ -81,7 +81,7 @@ class CategoryServiceTest {
 
     @Test
     @Transactional
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     void 없는부모_카테고리에_추가() {
         assertThrows(CategoryNotFoundException.class, () ->
                 categoryService.addChildCategory(1L, "child1")
@@ -90,7 +90,7 @@ class CategoryServiceTest {
 
     @Test
     @Transactional
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     void 자식_카테고리_중복검사() {
         Category parentCategory=categoryService.addTopCategory("parent1");
 
@@ -102,7 +102,7 @@ class CategoryServiceTest {
 
     @Test
     @Transactional
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     void 자식_자식_카테고리_중복검사() {
         Category parentCategory= categoryService.addTopCategory("parent1");
         Category childCategory=categoryService.addChildCategory( parentCategory.getId(),"child1");

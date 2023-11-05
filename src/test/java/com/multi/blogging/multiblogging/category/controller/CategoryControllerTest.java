@@ -27,6 +27,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
 import static com.multi.blogging.multiblogging.category.domain.QCategory.category;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,16 +56,15 @@ class CategoryControllerTest {
 
 
     static Member member;
-    static final String testEmail = "test@test.com";
 
     ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        member=memberRepository.save(Member.builder().email(testEmail).password("1234").build());
+        member=memberRepository.save(Member.builder().email(TEST_EMAIL).password("1234").build());
     }
     @Test
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     @Transactional
     void getMyCategories() throws Exception {
         Category parent1=categoryService.addTopCategory("parent1");
@@ -86,7 +86,7 @@ class CategoryControllerTest {
     }
 
     @Test
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     @Transactional
     void 업데이트카테고리() throws Exception {
         Category category = categoryService.addTopCategory("parent");
@@ -102,7 +102,7 @@ class CategoryControllerTest {
     }
 
     @Test
-    @WithMockUser(username = testEmail)
+    @WithMockUser(username = TEST_EMAIL)
     void 고아객체_제거_테스트() throws Exception {
         var parent=categoryService.addTopCategory("parent");
         categoryService.addChildCategory(parent.getId(), "child1");
@@ -119,7 +119,8 @@ class CategoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(0));
 
-        categoryRepository.deleteAll();
 
+        categoryRepository.deleteAll(); // 테스트 데이터 롤백
+        memberRepository.deleteAll(); // 테스트 데이터 롤백
     }
 }

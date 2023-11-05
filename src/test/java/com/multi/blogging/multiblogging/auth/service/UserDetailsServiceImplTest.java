@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -40,11 +41,11 @@ class UserDetailsServiceImplTest {
 
     @Test
     void loadUserByUserName() {
-        String testEmail = "test@test.com";
+        String testEmail = TEST_EMAIL;
         Member member = Member.builder()
                 .email(testEmail)
-                .password("1234")
-                .nickName("test")
+                .password(TEST_PASSWORD)
+                .nickName(TEST_NICK)
                 .authority(Authority.MEMBER)
                 .build();
         em.persist(member);

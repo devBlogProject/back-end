@@ -7,20 +7,17 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_NICK;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RandomNickNameProviderTest {
 
     static RandomNickNameProvider randomNickNameProvider;
 
-    @BeforeAll()
-    static void init(){
-        randomNickNameProvider=new RandomNickNameProvider();
-    }
 
     @Test()
     void 랜덤닉네임(){
-        String testNickName="test";
+        String testNickName=TEST_NICK;
         List<Member> memberList = new ArrayList<Member>();
         memberList.add(Member.builder().nickName(testNickName + "0").build());
         memberList.add(Member.builder().nickName(testNickName + "1").build());
@@ -28,7 +25,7 @@ class RandomNickNameProviderTest {
         memberList.add(Member.builder().nickName(testNickName + "3").build());
         memberList.add(Member.builder().nickName(testNickName + "4").build());
 
-        String randomNickName = randomNickNameProvider.createRandomNickNameByMembers("test", memberList);
+        String randomNickName = RandomNickNameProvider.createRandomNickNameByMembers(TEST_NICK, memberList);
 
         System.out.println(randomNickName);
 

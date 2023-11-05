@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.AccessDeniedException;
 import java.util.Optional;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
+import static com.multi.blogging.multiblogging.Constant.TEST_PASSWORD;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -46,8 +48,6 @@ class AuthServiceTest {
     @Autowired
     MockMvc mockMvc;
 
-    static final String TEST_EMAIL = "test@test.com";
-    static final String TEST_PASSWORD = "1234";
 
 
     @BeforeEach

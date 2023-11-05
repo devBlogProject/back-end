@@ -21,12 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
+import static com.multi.blogging.multiblogging.Constant.TEST_NICK;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
@@ -49,9 +50,9 @@ class AuthControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         MemberSignUpRequestDto requestDto = new MemberSignUpRequestDto();
-        requestDto.setEmail("test@test.com");
+        requestDto.setEmail(TEST_EMAIL);
         requestDto.setPassword("1234");
-        requestDto.setNickName("test_nick");
+        requestDto.setNickName(TEST_NICK);
 
         mockMvc.perform(post("/member/signup")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +64,7 @@ class AuthControllerTest {
     @Transactional
     void 토큰발급_로그인() throws Exception {
         MemberLoginRequestDto requestDto = new MemberLoginRequestDto();
-        requestDto.setEmail("test@test.com");
+        requestDto.setEmail(TEST_EMAIL);
         requestDto.setPassword("1234");
 
 //        given(tokenProvider.validateToken(anyString()))
@@ -87,7 +88,7 @@ class AuthControllerTest {
     @Transactional
     void 토큰갱신() throws Exception {
         MemberLoginRequestDto requestDto = new MemberLoginRequestDto();
-        requestDto.setEmail("test@test.com");
+        requestDto.setEmail(TEST_EMAIL);
         requestDto.setPassword("1234");
 
 

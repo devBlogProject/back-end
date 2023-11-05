@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -31,16 +32,15 @@ class CategoryRepositoryTest {
     @Autowired
     private TestEntityManager em;
 
-    private final static String testEmail = "test@test.com";
     @BeforeEach
     void setUp(){
         memberRepository.save(Member.builder()
-                .email(testEmail).password("1234").build());
+                .email(TEST_EMAIL).password("1234").build());
     }
 
     @Test
     void findByTitle() {
-        var member = memberRepository.findOneByEmail(testEmail).orElseThrow();
+        var member = memberRepository.findOneByEmail(TEST_EMAIL).orElseThrow();
         Category category = new Category("test", member);
         Category category1 = new Category("test1", member);
 
@@ -57,7 +57,7 @@ class CategoryRepositoryTest {
 
     @Test
     void findByIdWithMember(){
-        var existedMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
+        var existedMember = memberRepository.findOneByEmail(TEST_EMAIL).orElseThrow();
 
         Member newMember = Member.builder().email("new@new.com").password("1234").build();
         newMember = memberRepository.save(newMember);
@@ -78,7 +78,7 @@ class CategoryRepositoryTest {
 
     @Test
     void findAllTopCategoriesWithMember(){
-        var member1 = memberRepository.findOneByEmail(testEmail).orElseThrow();
+        var member1 = memberRepository.findOneByEmail(TEST_EMAIL).orElseThrow();
         Category category1 = new Category("test1", member1);
         Category category2 = new Category("test2", member1);
         Category category3 = new Category("test3", member1);
