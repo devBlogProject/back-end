@@ -33,7 +33,7 @@ public class MemberController {
     public ApiResponse<MemberResponseDto> updateProfileImage(
             @Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
             @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto) {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto));
+        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto.getImage()));
         return ApiResponse.createSuccess(dto);
     }
 
