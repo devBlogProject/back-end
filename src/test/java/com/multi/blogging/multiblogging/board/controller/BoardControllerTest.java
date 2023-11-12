@@ -66,7 +66,7 @@ class BoardControllerTest {
                         .content(objectMapper.writeValueAsString(memberSignUpRequestDto)))
                 .andExpect(status().isCreated());
 
-        MvcResult result = mockMvc.perform(post("/category")  //게시판 작성에 필요한 카테고리
+        MvcResult result = mockMvc.perform(post(String.format("/%s/category",TEST_NICK))  //게시판 작성에 필요한 카테고리
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoryRequestDto("test_category"))))
                 .andExpect(status().isCreated())
@@ -115,7 +115,7 @@ class BoardControllerTest {
                         .content(objectMapper.writeValueAsString(memberSignUpRequestDto)))
                 .andExpect(status().isCreated());
 
-        MvcResult result = mockMvc.perform(post("/category")  //게시판 작성에 필요한 카테고리
+        MvcResult result = mockMvc.perform(post(String.format("/%s/category",TEST_NICK))  //게시판 작성에 필요한 카테고리
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoryRequestDto("test_category"))))
                 .andExpect(status().isCreated())
@@ -159,7 +159,7 @@ class BoardControllerTest {
                         .content(objectMapper.writeValueAsString(memberSignUpRequestDto)))
                 .andExpect(status().isCreated());
 
-        MvcResult result = mockMvc.perform(post("/category")  //게시판 작성에 필요한 카테고리
+        MvcResult result = mockMvc.perform(post(String.format("/%s/category",TEST_NICK))  //게시판 작성에 필요한 카테고리
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoryRequestDto("test_category"))))
                 .andExpect(status().isCreated())

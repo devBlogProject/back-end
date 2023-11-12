@@ -4,7 +4,6 @@ import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
-import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
@@ -55,32 +54,39 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<Category> getMyTopCategories(){
-        var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        return categoryRepository.findAllTopCategoriesWithMember(member);
+    public List<Category> getTopCategories(String nickname){
+        var member = memberRepository.findByNickName(nickname).orElseThrow(MemberNotFoundException::new);
+        return categoryRepository.findTopCategoriesWithMember(member);
     }
 
     @Transactional
     public Category updateCategory(String title,Long categoryId){
         var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
-        if (!category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
-            throw new CategoryNotFoundException();
+        List<Category> siblingCategories;
+        if (category.getParent()==null){
+            var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+            siblingCategories=categoryRepository.findTopCategoriesWithMember(member);
+        }else{
+            siblingCategories = category.getParent().getChildrenCategories();
+        }
+        if (isDuplicate(siblingCategories,title)){
+            throw new CategoryDuplicateException();
         }
 
         category.setTitle(title);
+
         return category;
     }
 
     @Transactional
     public void deleteCategory(Long id){
         Optional<Category> category = categoryRepository.findById(id);
-        if (category.isPresent()){
-            if (!category.get().getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
-                throw new CategoryAccessPermissionDeniedException();
-            }
-        }
-
         categoryRepository.deleteById(id);
+    }
+
+    public boolean hasCategoryAccessPermission(String nickname){
+        var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+        return member.getNickName().equals(nickname);
     }
 
     private boolean isDuplicate(List<Category> categories, String title){

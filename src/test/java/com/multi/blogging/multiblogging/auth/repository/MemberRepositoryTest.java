@@ -23,8 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
-import static com.multi.blogging.multiblogging.Constant.TEST_NICK;
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -90,11 +89,19 @@ class MemberRepositoryTest {
     @Test
     void 닉네임중복체크(){
         String testEmail=TEST_EMAIL;
-        Member member =Member.builder().email(testEmail).password("1234").nickName(TEST_NICK).build();
+        Member member =Member.builder().email(testEmail).password(TEST_PASSWORD).nickName(TEST_NICK).build();
         memberRepository.save(member);
 
         assertTrue(memberRepository.existsByNickName(TEST_NICK));
         assertFalse(memberRepository.existsByNickName("test1"));
+    }
+
+    @Test
+    void findByNickName(){
+        Member member =Member.builder().email(TEST_EMAIL).password(TEST_PASSWORD).nickName(TEST_NICK).build();
+        memberRepository.save(member);
+
+        assertTrue(memberRepository.findByNickName(TEST_NICK).isPresent());
     }
 
     @Test

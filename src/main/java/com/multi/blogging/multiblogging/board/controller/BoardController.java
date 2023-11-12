@@ -28,14 +28,13 @@ public class BoardController {
     public ApiResponse<BoardResponseDto> writeBoard(@RequestPart(required = false)   MultipartFile thumbnail,
                                                     @Valid @RequestPart BoardRequestDto boardRequestDto){
         Board writedBoard = boardService.writeBoard(boardRequestDto, thumbnail);
-
         return ApiResponse.createSuccess(BoardResponseDto.of(writedBoard));
     }
 
 
     @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<String> uploadimage(@Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
+    public ApiResponse<String> uploadImage(@Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
                                            @ModelAttribute BoardImageUploadRequestDto boardImageUploadRequestDto) {
         String imageUrl = boardService.uploadImage(boardImageUploadRequestDto.getImage());
         return ApiResponse.createSuccess(imageUrl);

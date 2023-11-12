@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,7 +76,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    void findAllTopCategoriesWithMember(){
+    void findAllCategoriesWithMember(){
         var member1 = memberRepository.findOneByEmail(TEST_EMAIL).orElseThrow();
         Category category1 = new Category("test1", member1);
         Category category2 = new Category("test2", member1);
@@ -87,10 +86,13 @@ class CategoryRepositoryTest {
         categoryRepository.save(category2);
         categoryRepository.save(category3);
 
-        Category childCategory = new Category("child", member1);
-        childCategory.changeParentCategory(parent1);
-        categoryRepository.save(childCategory);
+        Category childCategory1 = new Category("child", member1);
+        childCategory1.changeParentCategory(parent1);
+        categoryRepository.save(childCategory1);
 
+        Category childCategory2 = new Category("child", member1);
+        childCategory2.changeParentCategory(parent1);
+        categoryRepository.save(childCategory2);
         Member member2 = Member.builder()
                 .email("test2@test2.com")
                 .password("1234")
@@ -102,8 +104,8 @@ class CategoryRepositoryTest {
         Category category4 = new Category("test4", member2);
         categoryRepository.save(category4);
 
-        assertEquals(categoryRepository.findAllTopCategoriesWithMember(member1).size(),3);
-        assertEquals(categoryRepository.findAllTopCategoriesWithMember(member2).size(),1);
+        assertEquals(categoryRepository.findTopCategoriesWithMember(member1).size(),3);
+        assertEquals(categoryRepository.findTopCategoriesWithMember(member2).size(),1);
     }
 
 //    @Test

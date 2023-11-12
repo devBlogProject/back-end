@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface CustomCategoryRepository {
     Optional<Category> findByIdWithMember(Member member,Long categoryId);
 
-    List<Category> findAllTopCategoriesWithMember(Member member);
+    List<Category> findTopCategoriesWithMember(Member member);
 }

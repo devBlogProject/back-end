@@ -1,10 +1,14 @@
 package com.multi.blogging.multiblogging.category.controller;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
+import com.multi.blogging.multiblogging.auth.service.UserDetailsServiceImpl;
+import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
 import com.multi.blogging.multiblogging.category.dto.response.CategoryResponseDto;
+import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
 import com.multi.blogging.multiblogging.category.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +19,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
@@ -27,8 +36,9 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
-import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
+import static com.multi.blogging.multiblogging.Constant.*;
 import static com.multi.blogging.multiblogging.category.domain.QCategory.category;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -61,23 +71,23 @@ class CategoryControllerTest {
 
     @BeforeEach
     void setUp() {
-        member=memberRepository.save(Member.builder().email(TEST_EMAIL).password("1234").build());
+        member=memberRepository.save(Member.builder().email(TEST_EMAIL).password("1234").nickName(TEST_NICK).build());
     }
     @Test
     @WithMockUser(username = TEST_EMAIL)
     @Transactional
-    void getMyCategories() throws Exception {
+    void getCategories() throws Exception {
         Category parent1=categoryService.addTopCategory("parent1");
         Category parent2=categoryService.addTopCategory("parent2");
         Category parent3=categoryService.addTopCategory("parent3");
 
 
-        categoryService.addChildCategory(parent1.getId(),"child1" );
-        categoryService.addChildCategory(parent1.getId(),"child2" );
-        categoryService.addChildCategory(parent1.getId(),"child3" );
-        categoryService.addChildCategory(parent1.getId(),"child4" );
+        categoryService.addChildCategory(parent1.getId(),"child1");
+        categoryService.addChildCategory(parent1.getId(),"child2");
+        categoryService.addChildCategory(parent1.getId(),"child3");
+        categoryService.addChildCategory(parent1.getId(),"child4");
 
-        String uri = "/category/all";
+        String uri = String.format("/%s/category/all",TEST_NICK);
         mockMvc.perform(get(uri))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(3))
@@ -93,7 +103,7 @@ class CategoryControllerTest {
         CategoryRequestDto requestDto = new CategoryRequestDto();
         requestDto.setTitle("parent1");
 
-        String uri = String.format("/category/%d", category.getId());
+        String uri = String.format("/%s/category/%d",TEST_NICK, category.getId());
         mockMvc.perform(patch(uri)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -109,11 +119,11 @@ class CategoryControllerTest {
         categoryService.addChildCategory(parent.getId(), "child2");
         categoryService.addChildCategory(parent.getId(), "child3");
 
-        mockMvc.perform(delete("/category/{id}",parent.getId()))
+        mockMvc.perform(delete("/{nickname}/category/{id}",TEST_NICK,parent.getId()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        String uri = "/category/all";
+        String uri = String.format("/%s/category/all",TEST_NICK);
         mockMvc.perform(get(uri))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -122,5 +132,50 @@ class CategoryControllerTest {
 
         categoryRepository.deleteAll(); // 테스트 데이터 롤백
         memberRepository.deleteAll(); // 테스트 데이터 롤백
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = TEST_EMAIL)
+    void 메소드권한체크() throws Exception {
+        Category parent1=categoryService.addTopCategory("parent1");
+        Category parent2=categoryService.addTopCategory("parent2");
+        Category parent3=categoryService.addTopCategory("parent3");
+
+
+        memberRepository.save(Member.builder().email("another_test@test.com").password(TEST_PASSWORD).nickName("another_test_nick").authority(Authority.MEMBER).build());
+        UserDetailsService userDetailsService = new UserDetailsServiceImpl(memberRepository);
+        UserDetails user = userDetailsService.loadUserByUsername("another_test@test.com");
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
+
+
+        mockMvc.perform(post(String.format("/%s/category", TEST_NICK))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
+                .andExpect(status().is4xxClientError())
+                .andExpect(status().reason(containsString("권한")))
+                .andDo(print());
+
+        mockMvc.perform(post(String.format("/%s/category/%d", TEST_NICK,parent1.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
+                .andExpect(status().is4xxClientError())
+                .andExpect(status().reason(containsString("권한")))
+                .andDo(print());
+
+        mockMvc.perform(patch(String.format("/%s/category/%d", TEST_NICK,parent1.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
+                .andExpect(status().is4xxClientError())
+                .andExpect(status().reason(containsString("권한")))
+                .andDo(print());
+
+        mockMvc.perform(delete(String.format("/%s/category/%d", TEST_NICK,parent1.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
+                .andExpect(status().is4xxClientError())
+                .andExpect(status().reason(containsString("권한")))
+                .andDo(print());
     }
 }

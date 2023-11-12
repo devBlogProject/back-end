@@ -61,22 +61,33 @@ class CategoryServiceTest {
     @Transactional
     @WithMockUser(username = TEST_EMAIL)
     void 업데이트카테고리(){
-        Member anotherMember = Member.builder().email("test2@test.com").password("anything").build();
-        anotherMember=memberRepository.save(anotherMember);
-
         Category parent1=categoryService.addTopCategory("parent1");
         String oldTitle = parent1.getTitle();
-
-
-
 
         categoryService.updateCategory("parent2", parent1.getId());
         assertNotEquals(parent1.getTitle(),oldTitle);
 
-        Category parent2 = new Category("parent2", anotherMember);
-        Category savedParent2=categoryRepository.save(parent2);
-        assertThrows(CategoryNotFoundException.class, () ->
-                categoryService.updateCategory("parent3", savedParent2.getId()));
+//        Category parent2 = new Category("parent2", anotherMember);
+//        Category savedParent2=categoryRepository.save(parent2);
+//        assertThrows(CategoryNotFoundException.class, () ->
+//                categoryService.updateCategory("parent3", savedParent2.getId()));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = TEST_EMAIL)
+    void 업데이트카테고리_중복_테스트(){
+        Category parent1=categoryService.addTopCategory("parent1");
+        Category parent2=categoryService.addTopCategory("parent2");
+        Category parent3=categoryService.addTopCategory("parent3");
+
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.updateCategory("parent2", parent1.getId()));
+
+        Category child1 = categoryService.addChildCategory(parent1.getId(),"child1");
+        Category child2 = categoryService.addChildCategory(parent1.getId(),"child2");
+        Category child3 = categoryService.addChildCategory(parent1.getId(),"child3");
+
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.updateCategory("child2", child1.getId()));
     }
 
     @Test

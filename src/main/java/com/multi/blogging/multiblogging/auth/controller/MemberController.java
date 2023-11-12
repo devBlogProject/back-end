@@ -37,7 +37,7 @@ public class MemberController {
         return ApiResponse.createSuccess(dto);
     }
 
-    @PutMapping("/password")
+    @PatchMapping("/password")
     public ApiResponse<?> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto) {
         memberService.modifyPassword(modifyPasswordRequestDto);
         return ApiResponse.createSuccessWithNoContent();
