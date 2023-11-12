@@ -31,6 +31,11 @@ public class BoardController {
         return ApiResponse.createSuccess(BoardResponseDto.of(writedBoard));
     }
 
+    @GetMapping("/{board_id}")
+    public ApiResponse<BoardResponseDto> getBoard(@PathVariable("board_id") Long boardId){
+        Board board = boardService.getBoard(boardId);
+        return ApiResponse.createSuccess(BoardResponseDto.of(board));
+    }
 
     @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)

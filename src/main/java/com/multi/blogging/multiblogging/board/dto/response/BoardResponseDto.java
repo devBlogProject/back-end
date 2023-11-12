@@ -13,7 +13,7 @@ public class BoardResponseDto {
     private String content;
     private String thumbnailUrl;
     private Long categoryId;
-    private MemberResponseDto authorResponseDto;
+    private MemberResponseDto author;
 
     // private List<Comment> parentComments = new ArrayList<Comment>();
 
@@ -25,7 +25,7 @@ public class BoardResponseDto {
         this.content = content;
         this.categoryId = categoryId;
         this.thumbnailUrl = thumbnailUrl;
-        this.authorResponseDto = authorResponseDtoResponseDto;
+        this.author = authorResponseDtoResponseDto;
     }
 
     public static BoardResponseDto of(Board board) {
