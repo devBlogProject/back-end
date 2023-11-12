@@ -26,7 +26,7 @@ public class AuthController {
     public ApiResponse<TokenDto> login(
             @Valid @RequestBody MemberLoginRequestDto memberLoginRequestDto
     ){
-        return ApiResponse.createSuccess(authService.login(memberLoginRequestDto));
+        return ApiResponse.createSuccess(authService.login(memberLoginRequestDto.getEmail(), memberLoginRequestDto.getPassword()));
     }
 
 

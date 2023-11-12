@@ -70,11 +70,7 @@ class AuthServiceTest {
     @Test
     @Transactional
     void login() throws Exception {
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto();
-        memberLoginRequestDto.setEmail(TEST_EMAIL);
-        memberLoginRequestDto.setPassword(TEST_PASSWORD);
-
-        TokenDto tokenDto = authService.login(memberLoginRequestDto);
+        TokenDto tokenDto = authService.login(TEST_EMAIL,TEST_PASSWORD);
         setAuthentication();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/sample").header("Authorization",tokenDto.getAccessToken())).andExpect(status().isOk());
@@ -83,11 +79,7 @@ class AuthServiceTest {
     @Test
     @Transactional
     void logout() {
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto();
-        memberLoginRequestDto.setEmail(TEST_EMAIL);
-        memberLoginRequestDto.setPassword(TEST_PASSWORD);
-
-        authService.login(memberLoginRequestDto);
+        authService.login(TEST_EMAIL,TEST_PASSWORD);
         setAuthentication();
         assertNotNull(
                 refreshTokenRepository.findById(TEST_EMAIL)
@@ -100,11 +92,8 @@ class AuthServiceTest {
     @Test
     @Transactional
     void reIssue() throws AccessDeniedException, InterruptedException {
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto();
-        memberLoginRequestDto.setEmail(TEST_EMAIL);
-        memberLoginRequestDto.setPassword(TEST_PASSWORD);
 
-        TokenDto tokenDto = authService.login(memberLoginRequestDto);
+        TokenDto tokenDto = authService.login(TEST_EMAIL,TEST_PASSWORD);
         setAuthentication();
 
         Thread.sleep(1000);

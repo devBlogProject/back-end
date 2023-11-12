@@ -61,8 +61,8 @@ class BoardRepositoryTest {
                     .author(testMember)
                     .category(testCategory)
                     .build();
-            board.setCreatedDate(LocalDateTime.now().plusDays((long) i));
             boardRepository.save(board);
+            Thread.sleep(100);
         }
         PageRequest pageRequest = PageRequest.of(0, 5,Sort.by(Sort.Direction.DESC,"createdDate"));
         Slice<Board> boards=boardRepository.findSliceBy(pageRequest);

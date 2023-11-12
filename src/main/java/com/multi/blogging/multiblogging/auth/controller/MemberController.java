@@ -25,7 +25,7 @@ public class MemberController {
 
     @PatchMapping("/nickname")
     public ApiResponse<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto) {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto));
+        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto.getNickName()));
         return ApiResponse.createSuccess(dto);
     }
 
@@ -39,7 +39,7 @@ public class MemberController {
 
     @PatchMapping("/password")
     public ApiResponse<?> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto) {
-        memberService.modifyPassword(modifyPasswordRequestDto);
+        memberService.modifyPassword(modifyPasswordRequestDto.getOldPassword(), modifyPasswordRequestDto.getNewPassword());
         return ApiResponse.createSuccessWithNoContent();
     }
 

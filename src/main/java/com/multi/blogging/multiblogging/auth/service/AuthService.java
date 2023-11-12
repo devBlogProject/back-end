@@ -34,9 +34,9 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenDto login(MemberLoginRequestDto dto) {
+    public TokenDto login(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
+                new UsernamePasswordAuthenticationToken(email, password);
 
         // authenticate 메소드가 실행이 될 때 CustomUserDetailsService class의 loadUserByUsername 메소드가 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);

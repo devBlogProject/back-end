@@ -42,29 +42,29 @@ public class MemberService {
 
 
     @Transactional
-    public Member modifyNickName(ModifyNickNameRequestDto dto) {
+    public Member modifyNickName(String nickName) {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        if (memberRepository.existsByNickName(dto.getNickName())){
+        if (memberRepository.existsByNickName(nickName)){
             throw new NickNameDuplicateException();
         }
-        member.get().setNickName(dto.getNickName());
+        member.get().setNickName(nickName);
         return member.get();
     }
 
     @Transactional
-    public void modifyPassword(ModifyPasswordRequestDto dto) {
+    public void modifyPassword(String oldPassword, String newPassword) {
         Optional<Member> member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail());
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        if (!passwordEncoder.matches(dto.getOldPassword(), member.get().getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, member.get().getPassword())) {
             throw new PasswordNotMachingException();
         }
-        member.get().updatePassword(passwordEncoder,dto.getNewPassword());
+        member.get().updatePassword(passwordEncoder,newPassword);
     }
 
     @Transactional
