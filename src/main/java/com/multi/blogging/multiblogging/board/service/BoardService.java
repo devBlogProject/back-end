@@ -1,9 +1,11 @@
 package com.multi.blogging.multiblogging.board.service;
 
+import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
+import com.multi.blogging.multiblogging.board.exception.BoardNotFoundException;
 import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
@@ -28,13 +30,16 @@ public class BoardService {
     public static final String DEFAULT_THUMB_URL = "https://cdn.pixabay.com/photo/2020/11/08/13/28/tree-5723734_1280.jpg";
 
 
+    public Board getBoard(Long boardId){
+        return boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+    }
 
     public Board writeBoard(BoardRequestDto requestDto,MultipartFile thumbNailImage){
         var category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
         if (!hasAuthOfCategory(category)){
             throw new CategoryAccessPermissionDeniedException();
         }
-        var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).get();
+        var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
 
         String thumbnailUrl;
         if (thumbNailImage!=null){

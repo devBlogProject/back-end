@@ -87,7 +87,7 @@ class CategoryControllerTest {
         categoryService.addChildCategory(parent1.getId(),"child3");
         categoryService.addChildCategory(parent1.getId(),"child4");
 
-        String uri = String.format("/%s/category/all",TEST_NICK);
+        String uri = String.format("/category/%s/all",TEST_NICK);
         mockMvc.perform(get(uri))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(3))
@@ -103,7 +103,7 @@ class CategoryControllerTest {
         CategoryRequestDto requestDto = new CategoryRequestDto();
         requestDto.setTitle("parent1");
 
-        String uri = String.format("/%s/category/%d",TEST_NICK, category.getId());
+        String uri = String.format("/category/%d", category.getId());
         mockMvc.perform(patch(uri)
                         .content(objectMapper.writeValueAsString(requestDto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -119,11 +119,11 @@ class CategoryControllerTest {
         categoryService.addChildCategory(parent.getId(), "child2");
         categoryService.addChildCategory(parent.getId(), "child3");
 
-        mockMvc.perform(delete("/{nickname}/category/{id}",TEST_NICK,parent.getId()))
+        mockMvc.perform(delete("/category/{id}",parent.getId()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        String uri = String.format("/%s/category/all",TEST_NICK);
+        String uri = String.format("/category/%s/all",TEST_NICK);
         mockMvc.perform(get(uri))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -149,29 +149,21 @@ class CategoryControllerTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
 
-
-        mockMvc.perform(post(String.format("/%s/category", TEST_NICK))
+        mockMvc.perform(post(String.format("/category/%d",parent1.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
                 .andExpect(status().is4xxClientError())
                 .andExpect(status().reason(containsString("권한")))
                 .andDo(print());
 
-        mockMvc.perform(post(String.format("/%s/category/%d", TEST_NICK,parent1.getId()))
+        mockMvc.perform(patch(String.format("/category/%d",parent1.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
                 .andExpect(status().is4xxClientError())
                 .andExpect(status().reason(containsString("권한")))
                 .andDo(print());
 
-        mockMvc.perform(patch(String.format("/%s/category/%d", TEST_NICK,parent1.getId()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
-                .andExpect(status().is4xxClientError())
-                .andExpect(status().reason(containsString("권한")))
-                .andDo(print());
-
-        mockMvc.perform(delete(String.format("/%s/category/%d", TEST_NICK,parent1.getId()))
+        mockMvc.perform(delete(String.format("/category/%d", parent1.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
                 .andExpect(status().is4xxClientError())
