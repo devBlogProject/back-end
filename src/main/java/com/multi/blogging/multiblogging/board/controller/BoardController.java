@@ -9,11 +9,17 @@ import com.multi.blogging.multiblogging.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 
 
 @RestController
@@ -29,6 +35,20 @@ public class BoardController {
                                                     @Valid @RequestPart BoardRequestDto boardRequestDto){
         Board writedBoard = boardService.writeBoard(boardRequestDto, thumbnail);
         return ApiResponse.createSuccess(BoardResponseDto.of(writedBoard));
+    }
+
+    @GetMapping("/all")
+    public ApiResponse<Slice<BoardResponseDto>> getBoards(@RequestParam int page, @RequestParam int size){
+        PageRequest pageRequest = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdDate"));
+        Slice<Board> boards = boardService.getBoards(pageRequest);
+        return ApiResponse.createSuccess(boards.map(BoardResponseDto::of));
+    }
+
+    @PutMapping("/{board_id}")
+    public ApiResponse<BoardResponseDto> updateBoard(@RequestPart(required = false)MultipartFile thumbnail,@PathVariable("board_id") Long boardId,@Valid @RequestPart BoardRequestDto boardRequestDto){
+        Board updatedBoard = boardService.updateBoard(boardId,boardRequestDto,thumbnail);
+
+        return ApiResponse.createSuccess(BoardResponseDto.of(updatedBoard));
     }
 
     @GetMapping("/{board_id}")

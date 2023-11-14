@@ -6,6 +6,7 @@ import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
 import com.multi.blogging.multiblogging.board.exception.BoardNotFoundException;
+import com.multi.blogging.multiblogging.board.exception.BoardPermissionDeniedException;
 import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
@@ -16,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -34,19 +38,40 @@ public class BoardService {
         return boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
     }
 
+    @Transactional
+    public Board updateBoard(Long boardId,BoardRequestDto boardRequestDto,MultipartFile thumbNailImage){
+        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        if (!hasPermissionOfBoard(board)){
+            throw new BoardPermissionDeniedException();
+        }
+        if (thumbNailImage!=null){
+            String thumbnailUrl = uploadImage(thumbNailImage);
+            board.setThumbnailUrl(thumbnailUrl);
+        }
+
+        board.setTitle(boardRequestDto.getTitle());
+        board.setContent(boardRequestDto.getContent());
+        if (boardRequestDto.getCategoryId()!=board.getCategory().getId()){
+            Category category = categoryRepository.findById(boardRequestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
+            board.changeCategory(category);
+        }
+        return board;
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Board> getBoards(Pageable pageable){
+        return boardRepository.findSliceBy(pageable);
+    }
+
+    @Transactional
     public Board writeBoard(BoardRequestDto requestDto,MultipartFile thumbNailImage){
         var category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
-        if (!hasAuthOfCategory(category)){
+        if (!hasPermissionOfCategory(category)){
             throw new CategoryAccessPermissionDeniedException();
         }
         var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
 
-        String thumbnailUrl;
-        if (thumbNailImage!=null){
-        thumbnailUrl = imageUploadService.uploadFile(thumbNailImage);
-        }else{
-            thumbnailUrl = makeDefaultThumb(requestDto.getContent());
-        }
+        String thumbnailUrl = makeThumbnailUrl(thumbNailImage, requestDto.getContent());
 
         Board board = Board.builder()
                 .author(author)
@@ -63,7 +88,20 @@ public class BoardService {
         return imageUploadService.uploadFile(image);
     }
 
-    private boolean hasAuthOfCategory(Category category){
+    private boolean hasPermissionOfBoard(Board board){
+        return SecurityUtil.getCurrentMemberEmail().equals(board.getAuthor().getEmail());
+    }
+
+    private String makeThumbnailUrl(MultipartFile thumbnailImage, String content){
+        String thumbnailUrl;
+        if (thumbnailImage!=null){
+            thumbnailUrl = imageUploadService.uploadFile(thumbnailImage);
+        }else{
+            thumbnailUrl = makeDefaultThumb(content);
+        }
+        return thumbnailUrl;
+    }
+    private boolean hasPermissionOfCategory(Category category){
         return category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail());
     }
     private String makeDefaultThumb(String content) {

@@ -5,6 +5,8 @@ import com.multi.blogging.multiblogging.board.domain.Board;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class BoardResponseDto {
 
@@ -14,18 +16,22 @@ public class BoardResponseDto {
     private String thumbnailUrl;
     private Long categoryId;
     private MemberResponseDto author;
+    LocalDateTime createdDate;
+    LocalDateTime updatedTime;
 
     // private List<Comment> parentComments = new ArrayList<Comment>();
 
 
     @Builder
-    public BoardResponseDto(Long id,String title,String content,Long categoryId,String thumbnailUrl,MemberResponseDto authorResponseDtoResponseDto){
+    public BoardResponseDto(Long id, String title, String content, Long categoryId, String thumbnailUrl, MemberResponseDto authorResponseDtoResponseDto, LocalDateTime createdDate, LocalDateTime updatedTime){
         this.id=id;
         this.title=title;
         this.content = content;
         this.categoryId = categoryId;
         this.thumbnailUrl = thumbnailUrl;
         this.author = authorResponseDtoResponseDto;
+        this.createdDate = createdDate;
+        this.updatedTime = updatedTime;
     }
 
     public static BoardResponseDto of(Board board) {
@@ -35,7 +41,9 @@ public class BoardResponseDto {
                 .content(board.getContent())
                 .categoryId(board.getCategory().getId())
                 .thumbnailUrl(board.getThumbnailUrl())
+                .createdDate(board.getCreatedDate())
+                .updatedTime(board.getUpdatedDate())
                 .authorResponseDtoResponseDto(MemberResponseDto.of(board.getAuthor()))
-                        .build();
+                .build();
     }
 }
