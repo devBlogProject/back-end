@@ -34,7 +34,7 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
     }
 
     @Override
-    public List<Category> findAllTopCategoriesWithMember(Member member) {
+    public List<Category> findTopCategoriesWithMember(Member member) {
         return queryFactory
                 .selectFrom(category)
                 .from(category, QMember.member)

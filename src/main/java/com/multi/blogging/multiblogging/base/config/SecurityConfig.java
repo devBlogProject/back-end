@@ -10,6 +10,7 @@ import com.multi.blogging.multiblogging.auth.service.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -45,7 +46,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/member/signup").permitAll()
-                        .requestMatchers(   "/member/email/**").permitAll()
+                        .requestMatchers("/member/email/**").permitAll()
                         .requestMatchers("/member/nickname/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
@@ -54,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/email/**").permitAll()
 //                        .requestMatchers("/sample").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/category/{nickname}/all").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/board/**").permitAll()
                         .anyRequest().authenticated())
 //                //== 소셜 로그인 설정 ==//
 //                .oauth2Login(Customizer.withDefaults())

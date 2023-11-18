@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -54,8 +55,8 @@ class MemberServiceTest {
     @Test
     @Transactional
     void updateMemberProfileImage(){
-        Member member =Member.builder().email("test@test.com")
-                .password("1234")
+        Member member =Member.builder().email(TEST_EMAIL)
+                .password(TEST_PASSWORD)
                 .authority(Authority.MEMBER)
                 .build();
         memberRepository.save(member);
@@ -70,9 +71,9 @@ class MemberServiceTest {
         UserDetails user = userDetailsService.loadUserByUsername(member.getEmail());
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
 
-        memberService.updateMemberProfileImage(requestDto);
+        memberService.updateMemberProfileImage(requestDto.getImage());
 
-        var findMember =memberRepository.findOneByEmail("test@test.com");
+        var findMember =memberRepository.findOneByEmail(TEST_EMAIL);
         assertEquals("http://sample.com",findMember.get().getImageUrl());
     }
 }

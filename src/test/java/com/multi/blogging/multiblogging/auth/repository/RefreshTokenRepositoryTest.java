@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.sql.Ref;
 import java.util.Optional;
 
+import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -21,7 +22,7 @@ class RefreshTokenRepositoryTest {
 
     @Test
     void findByToken(){
-        RefreshToken refreshToken=new RefreshToken("test@test.com","123");
+        RefreshToken refreshToken=new RefreshToken(TEST_EMAIL,"123");
         refreshTokenRepository.save(refreshToken);
 
         Optional<RefreshToken> findToken= refreshTokenRepository.findByToken("123");

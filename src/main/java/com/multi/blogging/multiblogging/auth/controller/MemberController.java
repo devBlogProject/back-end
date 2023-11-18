@@ -25,7 +25,7 @@ public class MemberController {
 
     @PatchMapping("/nickname")
     public ApiResponse<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto) {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto));
+        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto.getNickName()));
         return ApiResponse.createSuccess(dto);
     }
 
@@ -33,13 +33,13 @@ public class MemberController {
     public ApiResponse<MemberResponseDto> updateProfileImage(
             @Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
             @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto) {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto));
+        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto.getImage()));
         return ApiResponse.createSuccess(dto);
     }
 
-    @PutMapping("/password")
+    @PatchMapping("/password")
     public ApiResponse<?> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto) {
-        memberService.modifyPassword(modifyPasswordRequestDto);
+        memberService.modifyPassword(modifyPasswordRequestDto.getOldPassword(), modifyPasswordRequestDto.getNewPassword());
         return ApiResponse.createSuccessWithNoContent();
     }
 

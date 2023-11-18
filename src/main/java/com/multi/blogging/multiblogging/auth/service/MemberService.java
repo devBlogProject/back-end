@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class MemberService {
 //    @PostConstruct //테스트 유저 생성
 //    private void addTestMember(){
 //        Member member = Member.builder()
-//                .email("test@test.com")
+//                .email(Test_EMAIL)
 //                .password(passwordEncoder.encode("1234"))
 //                .nickName("test_nick")
 //                .authority(Authority.ADMIN)
@@ -41,29 +42,29 @@ public class MemberService {
 
 
     @Transactional
-    public Member modifyNickName(ModifyNickNameRequestDto dto) {
+    public Member modifyNickName(String nickName) {
         String email = SecurityUtil.getCurrentMemberEmail();
         Optional<Member> member = memberRepository.findOneByEmail(email);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        if (memberRepository.existsByNickName(dto.getNickName())){
+        if (memberRepository.existsByNickName(nickName)){
             throw new NickNameDuplicateException();
         }
-        member.get().setNickName(dto.getNickName());
+        member.get().setNickName(nickName);
         return member.get();
     }
 
     @Transactional
-    public void modifyPassword(ModifyPasswordRequestDto dto) {
+    public void modifyPassword(String oldPassword, String newPassword) {
         Optional<Member> member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail());
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
-        if (!passwordEncoder.matches(dto.getOldPassword(), member.get().getPassword())) {
+        if (!passwordEncoder.matches(oldPassword, member.get().getPassword())) {
             throw new PasswordNotMachingException();
         }
-        member.get().updatePassword(passwordEncoder,dto.getNewPassword());
+        member.get().updatePassword(passwordEncoder,newPassword);
     }
 
     @Transactional
@@ -77,9 +78,9 @@ public class MemberService {
     }
 
     @Transactional
-    public Member updateMemberProfileImage(UpdateProfileImageRequestDto dto){
+    public Member updateMemberProfileImage(MultipartFile image){
         Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        String imageUrl = imageUploadService.uploadFile(dto.getImage());
+        String imageUrl = imageUploadService.uploadFile(image);
         member.setImageUrl(imageUrl);
         return member;
     }

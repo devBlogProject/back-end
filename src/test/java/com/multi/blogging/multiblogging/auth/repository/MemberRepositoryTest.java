@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -37,7 +38,7 @@ class MemberRepositoryTest {
 
     @Test
     void save(){
-        Member member = Member.builder().email("test@test.com").password("1234").nickName("test").build();
+        Member member = Member.builder().email(TEST_EMAIL).password("1234").nickName(TEST_NICK).build();
         assertTrue(memberRepository.findAll().isEmpty());
         memberRepository.save(member);
         assertEquals(memberRepository.findAll().toArray().length,1);
@@ -45,11 +46,10 @@ class MemberRepositoryTest {
 
     @Test
     void memberAuditingTest(){
-        String testEmail="test@test.com";
-        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        Member member =Member.builder().email(TEST_EMAIL).password("1234").nickName(TEST_NICK).build();
         memberRepository.save(member);
 
-        Member findMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
+        Member findMember = memberRepository.findOneByEmail(TEST_EMAIL).orElseThrow();
 
 
         assertNotNull(findMember.getCreatedDate());
@@ -60,7 +60,7 @@ class MemberRepositoryTest {
         findMember.setNickName("test1");
         memberRepository.save(findMember);
 
-        Member newMember = memberRepository.findOneByEmail(testEmail).orElseThrow();
+        Member newMember = memberRepository.findOneByEmail(TEST_EMAIL).orElseThrow();
 
         assertNotEquals(originalUpdatedDate,newMember.getUpdatedDate());
 
@@ -68,8 +68,8 @@ class MemberRepositoryTest {
 
     @Test
     void findOneByEmail(){
-        String testEmail="test@test.com";
-        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        String testEmail=TEST_EMAIL;
+        Member member =Member.builder().email(testEmail).password("1234").nickName(TEST_NICK).build();
         memberRepository.save(member);
         Member findMember=memberRepository.findOneByEmail(testEmail).get();
 
@@ -78,8 +78,8 @@ class MemberRepositoryTest {
 
     @Test
     void 이메일중복체크(){
-        String testEmail="test@test.com";
-        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        String testEmail=TEST_EMAIL;
+        Member member =Member.builder().email(testEmail).password("1234").nickName(TEST_NICK).build();
         memberRepository.save(member);
 
         assertTrue(memberRepository.existsByEmail(testEmail));
@@ -88,12 +88,20 @@ class MemberRepositoryTest {
 
     @Test
     void 닉네임중복체크(){
-        String testEmail="test@test.com";
-        Member member =Member.builder().email(testEmail).password("1234").nickName("test").build();
+        String testEmail=TEST_EMAIL;
+        Member member =Member.builder().email(testEmail).password(TEST_PASSWORD).nickName(TEST_NICK).build();
         memberRepository.save(member);
 
-        assertTrue(memberRepository.existsByNickName("test"));
+        assertTrue(memberRepository.existsByNickName(TEST_NICK));
         assertFalse(memberRepository.existsByNickName("test1"));
+    }
+
+    @Test
+    void findByNickName(){
+        Member member =Member.builder().email(TEST_EMAIL).password(TEST_PASSWORD).nickName(TEST_NICK).build();
+        memberRepository.save(member);
+
+        assertTrue(memberRepository.findByNickName(TEST_NICK).isPresent());
     }
 
     @Test
