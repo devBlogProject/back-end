@@ -19,7 +19,7 @@ services:
       - web
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:11.0.3
     container_name: mariadb
     environment:
       - MARIADB_DATABASE=multi_blogging
