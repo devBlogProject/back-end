@@ -38,6 +38,14 @@ public class BoardService {
         return boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
     }
 
+    public void deleteBoard(Long boardId){
+        var board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        if (!board.getAuthor().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
+            throw new BoardPermissionDeniedException();
+        }
+        boardRepository.delete(board);
+    }
+
     @Transactional
     public Board updateBoard(Long boardId,BoardRequestDto boardRequestDto,MultipartFile thumbNailImage){
         Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);

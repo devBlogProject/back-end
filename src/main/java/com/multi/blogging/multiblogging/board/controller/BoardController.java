@@ -57,6 +57,12 @@ public class BoardController {
         return ApiResponse.createSuccess(BoardResponseDto.of(board));
     }
 
+    @DeleteMapping("/{board_id}")
+    public ApiResponse<?> deleteBoard(@PathVariable("board_id") Long boardId){
+        boardService.deleteBoard(boardId);
+        return ApiResponse.createSuccessWithNoContent();
+    }
+
     @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<String> uploadImage(@Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
