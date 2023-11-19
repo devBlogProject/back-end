@@ -2,9 +2,11 @@ package com.multi.blogging.multiblogging.board.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
+import com.multi.blogging.multiblogging.auth.service.MemberService;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.dto.request.BoardImageUploadRequestDto;
 import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
+import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.board.service.BoardService;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
@@ -20,12 +22,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,11 +77,30 @@ class BoardControllerTest {
 
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    MemberService memberService;
+    @Autowired
+    UserDetailsService userDetailsService;
+    @Autowired
+    BoardRepository boardRepository;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
 
     Long categoryId;
+
+    private void setAuthNewUser(){
+        MemberSignUpRequestDto memberSignUpRequestDto = new MemberSignUpRequestDto();
+        memberSignUpRequestDto.setEmail("abc@abc.com");
+        memberSignUpRequestDto.setPassword("1234");
+        memberSignUpRequestDto.setNickName("anotherUser");
+        memberService.signUp(memberSignUpRequestDto);
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetails user = userDetailsService.loadUserByUsername("abc@abc.com");
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
+    }
+
 
     @BeforeEach
     void setUp() throws Exception {
@@ -91,6 +121,49 @@ class BoardControllerTest {
 
         String response = result.getResponse().getContentAsString();
         categoryId = ((Number) JsonPath.read(response, "$.data.id")).longValue();
+    }
+
+    @Test
+    void 게시물_수정_삭제_권한체크() throws Exception{
+        BoardRequestDto boardRequestDto = new BoardRequestDto();
+        boardRequestDto.setTitle("title");
+        boardRequestDto.setContent(String.valueOf(html(body(h1("hello world")))));
+        boardRequestDto.setCategoryId(categoryId);
+        var result=mockMvc.perform(multipart("/board")
+                        .file(new MockMultipartFile("boardRequestDto",
+                                "dto",
+                                "application/json",
+                                objectMapper.writeValueAsString(boardRequestDto).getBytes(StandardCharsets.UTF_8)))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String response = result.getResponse().getContentAsString();
+        Long boardId = ((Number) JsonPath.read(response, "$.data.id")).longValue();
+
+        setAuthNewUser();
+        SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
+
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart("/board/{id}",boardId);
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+        mockMvc.perform(builder.file(new MockMultipartFile("boardRequestDto",
+                "dto",
+                "application/json",
+                objectMapper.writeValueAsString(boardRequestDto).getBytes(StandardCharsets.UTF_8))).with(user))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete("/board/{id}",boardId)
+                        .with(user))
+                .andExpect(status().isForbidden());
+
+        assertEquals(1,boardRepository.findAll().size());
     }
 
     @Test
@@ -159,7 +232,6 @@ class BoardControllerTest {
     }
 
     @Test
-
     @DisplayName("콘텐츠에도 이미지 없고 썸네일은 있을 때")
     void writeBoardWithoutThumbNailAndWithImgOfBoard() throws Exception {
         String content = html(body(h1("hello world"),
@@ -188,7 +260,6 @@ class BoardControllerTest {
     }
 
     @Test
-
     @DisplayName("콘텐츠에도 이미지 없고 썸네일 파일도 없을 때")
     void writeBoardWithoutThumbNailAndWithoutImgOfContents() throws Exception {
         BoardRequestDto boardRequestDto = new BoardRequestDto();
@@ -250,4 +321,6 @@ class BoardControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data").value("http://image.file"));
     }
+
+
 }

@@ -42,18 +42,12 @@ public class BoardService {
     @Transactional
     public void deleteBoard(Long boardId){
         var board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        if (!hasPermissionOfBoard(board)){
-            throw new BoardPermissionDeniedException();
-        }
         boardRepository.delete(board);
     }
 
     @Transactional
     public Board updateBoard(Long boardId,BoardRequestDto boardRequestDto,MultipartFile thumbNailImage){
         Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        if (!hasPermissionOfBoard(board)){
-            throw new BoardPermissionDeniedException();
-        }
         if (thumbNailImage!=null){
             String thumbnailUrl = uploadImage(thumbNailImage);
             board.setThumbnailUrl(thumbnailUrl);
@@ -99,9 +93,6 @@ public class BoardService {
         return imageUploadService.uploadFile(image);
     }
 
-    private boolean hasPermissionOfBoard(Board board){
-        return SecurityUtil.getCurrentMemberEmail().equals(board.getAuthor().getEmail());
-    }
 
     private String makeThumbnailUrl(MultipartFile thumbnailImage, String content){
         String thumbnailUrl;

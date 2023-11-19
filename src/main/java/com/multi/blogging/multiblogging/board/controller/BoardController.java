@@ -44,7 +44,7 @@ public class BoardController {
         return ApiResponse.createSuccess(boards.map(BoardResponseDto::of));
     }
 
-    @PutMapping("/{board_id}")
+    @PutMapping(path = "/{board_id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<BoardResponseDto> updateBoard(@RequestPart(required = false)MultipartFile thumbnail,@PathVariable("board_id") Long boardId,@Valid @RequestPart BoardRequestDto boardRequestDto){
         Board updatedBoard = boardService.updateBoard(boardId,boardRequestDto,thumbnail);
 

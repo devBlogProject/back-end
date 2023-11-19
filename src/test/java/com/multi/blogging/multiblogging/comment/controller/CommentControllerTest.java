@@ -159,7 +159,7 @@ class CommentControllerTest {
 
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetails user = userDetailsService.loadUserByUsername("abc@abc.com");
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, "sampleToken", user.getAuthorities()));
     }
 
 }
