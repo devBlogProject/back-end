@@ -34,13 +34,15 @@ public class BoardService {
     public static final String DEFAULT_THUMB_URL = "https://cdn.pixabay.com/photo/2020/11/08/13/28/tree-5723734_1280.jpg";
 
 
+    @Transactional(readOnly = true)
     public Board getBoard(Long boardId){
         return boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
     }
 
+    @Transactional
     public void deleteBoard(Long boardId){
         var board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        if (!board.getAuthor().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
+        if (!hasPermissionOfBoard(board)){
             throw new BoardPermissionDeniedException();
         }
         boardRepository.delete(board);
@@ -77,6 +79,7 @@ public class BoardService {
         if (!hasPermissionOfCategory(category)){
             throw new CategoryAccessPermissionDeniedException();
         }
+
         var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
 
         String thumbnailUrl = makeThumbnailUrl(thumbNailImage, requestDto.getContent());

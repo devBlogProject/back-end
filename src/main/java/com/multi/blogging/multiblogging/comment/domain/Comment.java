@@ -6,6 +6,7 @@ import com.multi.blogging.multiblogging.board.domain.Board;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
+@Getter @Setter
 public class Comment extends BaseEntity {
 
     @Id
@@ -25,7 +26,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent",fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<ReComment> children = new ArrayList<>();
 
@@ -36,11 +37,19 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Builder
-    public Comment(Board board, Member member, String content, List<ReComment> children) {
-        this.board = board;
-        this.member = member;
+    public Comment(Board board, Member member, String content) {
+        this.changeBoard(board);
+        this.changeMember(member);
         this.content = content;
-        this.children = children;
+    }
+
+    public void changeBoard(Board board){
+        this.board = board;
+        board.getParentCommentList().add(this);
+    }
+    public void changeMember(Member member){
+        this.member=member;
+        member.getCommentList().add(this);
     }
 
     protected Comment(){}

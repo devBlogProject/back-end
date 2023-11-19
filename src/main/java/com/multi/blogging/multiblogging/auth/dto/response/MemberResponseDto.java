@@ -2,6 +2,7 @@ package com.multi.blogging.multiblogging.auth.dto.response;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
+import com.multi.blogging.multiblogging.base.BaseResponseDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class MemberResponseDto {
+public class MemberResponseDto extends BaseResponseDto {
     private String email; //이메일
 
     private String nickName;
@@ -31,6 +32,8 @@ public class MemberResponseDto {
                 .createdDate(member.getCreatedDate())
                 .updatedDate(member.getUpdatedDate())
                 .imageUrl(member.getImageUrl())
+                .createdDate(member.getCreatedDate())
+                .updatedDate(member.getUpdatedDate())
                 .build();
     }
 }
