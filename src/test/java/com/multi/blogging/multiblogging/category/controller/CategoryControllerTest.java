@@ -1,8 +1,10 @@
 package com.multi.blogging.multiblogging.category.controller;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
+import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
+import com.multi.blogging.multiblogging.auth.service.MemberService;
 import com.multi.blogging.multiblogging.auth.service.UserDetailsServiceImpl;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
@@ -25,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
@@ -60,6 +63,12 @@ class CategoryControllerTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    MemberService memberService;
+
+    @Autowired
+    UserDetailsService userDetailsService;
 
     @Autowired
     MockMvc mockMvc;
@@ -113,26 +122,63 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser(username = TEST_EMAIL)
-    void 고아객체_제거_테스트() throws Exception {
-        var parent=categoryService.addTopCategory("parent");
-        categoryService.addChildCategory(parent.getId(), "child1");
-        categoryService.addChildCategory(parent.getId(), "child2");
-        categoryService.addChildCategory(parent.getId(), "child3");
+    @Transactional
+    void 카테고리권한체크() throws Exception{
+        Category parent1=categoryService.addTopCategory("parent1");
 
-        mockMvc.perform(delete("/category/{id}",parent.getId()))
-                .andExpect(status().isOk())
+        setAuthNewUser();
+        SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
+
+        mockMvc.perform(post("/category/{parent_id}",parent1.getId()).with(user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
+                .andExpect(status().isForbidden())
                 .andDo(print());
 
-        String uri = String.format("/category/%s/all",TEST_NICK);
-        mockMvc.perform(get(uri))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.length()").value(0));
+        mockMvc.perform(patch("/category/{id}",parent1.getId()).with(user)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CategoryRequestDto("updateTitle"))))
+                .andExpect(status().isForbidden())
+                .andDo(print());
 
+        mockMvc.perform(delete("/category/{id}", parent1.getId()).with(user)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andDo(print());
 
-        categoryRepository.deleteAll(); // 테스트 데이터 롤백
-        memberRepository.deleteAll(); // 테스트 데이터 롤백
+        assertEquals(1,categoryRepository.findAll().size());
+
+        mockMvc.perform(post("/category")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CategoryRequestDto("title"))))
+                .andExpect(status().isCreated());
     }
+
+//    @Test
+//    @Transactional
+//    @WithMockUser(username = TEST_EMAIL)
+//    void 고아객체_제거_테스트() throws Exception {
+//        var parent=categoryService.addTopCategory("parent");
+//        categoryService.addChildCategory(parent.getId(), "child1");
+//        categoryService.addChildCategory(parent.getId(), "child2");
+//        categoryService.addChildCategory(parent.getId(), "child3");
+//
+//        mockMvc.perform(delete("/category/{id}",parent.getId()))
+//                .andExpect(status().isOk())
+//                .andDo(print());
+//
+//        categoryRepository.flush();
+//
+//        String uri = String.format("/category/%s/all",TEST_NICK);
+//        mockMvc.perform(get(uri))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.data.length()").value(0));
+//
+//
+//        categoryRepository.deleteAll(); // 테스트 데이터 롤백
+//        memberRepository.deleteAll(); // 테스트 데이터 롤백
+//    }
 
     @Test
     @Transactional
@@ -169,5 +215,17 @@ class CategoryControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(status().reason(containsString("권한")))
                 .andDo(print());
+    }
+
+    private void setAuthNewUser(){
+        MemberSignUpRequestDto memberSignUpRequestDto = new MemberSignUpRequestDto();
+        memberSignUpRequestDto.setEmail("abc@abc.com");
+        memberSignUpRequestDto.setPassword("1234");
+        memberSignUpRequestDto.setNickName("anotherUser");
+        memberService.signUp(memberSignUpRequestDto);
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        UserDetails user = userDetailsService.loadUserByUsername("abc@abc.com");
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
     }
 }

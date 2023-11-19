@@ -40,9 +40,6 @@ public class CategoryService {
     public Category addChildCategory(Long parentCategoryId,String title) {
         var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
         Category parentCategory = categoryRepository.findById(parentCategoryId).orElseThrow(CategoryNotFoundException::new);
-        if (parentCategory.getMember()!=member){
-            throw new CategoryAccessPermissionDeniedException();
-        }
         if (isDuplicate(parentCategory.getChildrenCategories(),title)){
             throw new CategoryDuplicateException();
         }
@@ -63,9 +60,6 @@ public class CategoryService {
     @Transactional
     public Category updateCategory(String title,Long categoryId){
         var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
-        if (!hasCategoryAccessPermission(category)){
-            throw new CategoryAccessPermissionDeniedException();
-        }
         List<Category> siblingCategories;
         if (category.getParent()==null){
             var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
@@ -84,17 +78,7 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategory(Long id){
-        Optional<Category> category = categoryRepository.findById(id);
-        if (category.isPresent()){
-            if (!hasCategoryAccessPermission(category.get())){
-                throw new CategoryAccessPermissionDeniedException();
-            }
-        }
         categoryRepository.deleteById(id);
-    }
-
-    private boolean hasCategoryAccessPermission(Category category){
-        return category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail());
     }
 
     private boolean isDuplicate(List<Category> categories, String title){

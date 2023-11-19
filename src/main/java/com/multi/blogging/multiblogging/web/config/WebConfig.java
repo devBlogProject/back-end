@@ -1,6 +1,7 @@
 package com.multi.blogging.multiblogging.web.config;
 
 import com.multi.blogging.multiblogging.board.interceptor.BoardAuthInterceptor;
+import com.multi.blogging.multiblogging.category.interceptor.CategoryAuthInterceptor;
 import com.multi.blogging.multiblogging.comment.interceptor.CommentAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final CommentAuthInterceptor commentAuthInterceptor;
     private final BoardAuthInterceptor boardAuthInterceptor;
+    private final CategoryAuthInterceptor categoryAuthInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry){
@@ -33,6 +35,9 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(boardAuthInterceptor)
                 .addPathPatterns("/board/**");
+
+        registry.addInterceptor(categoryAuthInterceptor)
+                .addPathPatterns("/category/**");
     }
 
 }
