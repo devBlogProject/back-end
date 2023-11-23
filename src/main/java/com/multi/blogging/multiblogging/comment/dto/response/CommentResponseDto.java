@@ -7,8 +7,9 @@ import com.multi.blogging.multiblogging.comment.domain.Comment;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
-@Builder
 public class CommentResponseDto extends BaseResponseDto {
     private Long id;
 
@@ -16,11 +17,22 @@ public class CommentResponseDto extends BaseResponseDto {
 
     private String content;
 
+
+    @Builder
+    public CommentResponseDto(Long id, MemberResponseDto memberResponseDto, String content, LocalDateTime createdDate,LocalDateTime updatedDate){
+        this.id=id;
+        this.memberResponseDto = memberResponseDto;
+        this.content = content;
+        this.createdDate = createdDate;
+        this.updatedDate = updatedDate;
+    }
     public static CommentResponseDto of(Comment comment){
         return CommentResponseDto.builder()
                 .id(comment.getId())
                 .memberResponseDto(MemberResponseDto.of(comment.getMember()))
                 .content(comment.getContent())
+                .createdDate(comment.getCreatedDate())
+                .updatedDate(comment.getUpdatedDate())
                 .build();
     }
 }
