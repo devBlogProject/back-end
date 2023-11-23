@@ -6,6 +6,7 @@ import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.comment.domain.Comment;
+import com.multi.blogging.multiblogging.comment.domain.ReComment;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,6 +51,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<ReComment> reCommentList = new ArrayList<>();
 
     @Builder
     public Member(String email, String password, String nickName, Authority authority,SocialType socialType,String socialId,String imageUrl) {

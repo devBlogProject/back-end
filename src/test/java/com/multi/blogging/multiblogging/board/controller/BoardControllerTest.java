@@ -182,7 +182,6 @@ class BoardControllerTest {
                 .andReturn();
         Long board1Id = ((Number) JsonPath.read(result.getResponse().getContentAsString(), "$.data.id")).longValue();
 
-
         BoardRequestDto boardRequestDto2 = new BoardRequestDto();
         boardRequestDto2.setTitle("title1");
         boardRequestDto2.setContent(String.valueOf(html(body(h1("hello world")))));

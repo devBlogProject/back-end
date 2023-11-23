@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomCategoryRepository {
-    Optional<Category> findByIdWithMember(Member member,Long categoryId);
+    Optional<Category> findByIdWithMember(Long categoryId);
 
     List<Category> findTopCategoriesWithMember(Member member);
 }

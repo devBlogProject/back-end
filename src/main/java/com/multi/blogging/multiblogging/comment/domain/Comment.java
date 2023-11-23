@@ -37,10 +37,11 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Builder
-    public Comment(Board board, Member member, String content) {
+    public Comment(Board board, Member member, String content, List<ReComment> children) {
         this.changeBoard(board);
         this.changeMember(member);
         this.content = content;
+//        this.children = children;
     }
 
     public void changeBoard(Board board){

@@ -25,7 +25,7 @@ public class CommentController {
         return ApiResponse.createSuccess(CommentResponseDto.of(comment));
     }
 
-    @PutMapping("/{comment_id}")
+    @PatchMapping("/{comment_id}")
     ApiResponse<CommentResponseDto> updateComment(@PathVariable("comment_id")Long commentId,
                                                   @Valid @RequestBody CommentUpdateRequestDto commentUpdateRequestDto
                                                   ){

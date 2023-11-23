@@ -68,11 +68,11 @@ class CategoryRepositoryTest {
         category2=categoryRepository.save(category2);
 
 
-        assertTrue(categoryRepository.findByIdWithMember(existedMember,category1.getId()).isPresent());
-        assertTrue(categoryRepository.findByIdWithMember(newMember,category2.getId()).isPresent());
+        assertTrue(categoryRepository.findByIdWithMember(category1.getId()).isPresent());
+        assertTrue(categoryRepository.findByIdWithMember(category2.getId()).isPresent());
 
-        assertFalse(categoryRepository.findByIdWithMember(existedMember,category2.getId()).isPresent());
-        assertFalse(categoryRepository.findByIdWithMember(newMember,category1.getId()).isPresent());
+        assertNotEquals(categoryRepository.findByIdWithMember(category2.getId()).get().getMember(),existedMember);
+        assertNotEquals(categoryRepository.findByIdWithMember(category1.getId()).get().getMember(),newMember);
     }
 
     @Test

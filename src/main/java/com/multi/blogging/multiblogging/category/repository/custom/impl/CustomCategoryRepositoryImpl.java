@@ -23,12 +23,11 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
 
 
     @Override
-    public Optional<Category> findByIdWithMember(Member member, Long categoryId) {
+    public Optional<Category> findByIdWithMember(Long categoryId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(category)
-                .from(category, QMember.member)
+                .join(category.member,member).fetchJoin()
                 .where(category.id.eq(categoryId)
-                        .and(category.member.eq(member))
                 ).fetchOne());
 
     }

@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,7 +17,7 @@ public class CategoryResponseDto extends BaseResponseDto {
 
     private String title;
 
-    private List<BoardResponseDto> boardResponseDtoList;
+    private List<BoardResponseDto> boards;
 
     private List<CategoryResponseDto> childrenCategories;
 
@@ -29,7 +28,7 @@ public class CategoryResponseDto extends BaseResponseDto {
         this.id = id;
         this.title = title;
         this.childrenCategories = childrenCategories;
-        this.boardResponseDtoList=boardResponseDtoList;
+        this.boards =boardResponseDtoList;
         this.createdDate=createdDate;
         this.updatedDate = updatedDate;
     }
