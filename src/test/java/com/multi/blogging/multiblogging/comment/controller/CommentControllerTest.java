@@ -106,7 +106,7 @@ class CommentControllerTest {
 
         CommentUpdateRequestDto commentUpdateRequestDto = new CommentUpdateRequestDto();
         commentUpdateRequestDto.setContent("updateComment");
-        mockMvc.perform(put("/comment/{id}", comment.getId())
+        mockMvc.perform(patch("/comment/{id}", comment.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentUpdateRequestDto)))
                 .andExpect(status().isOk())
