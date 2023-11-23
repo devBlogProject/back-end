@@ -7,6 +7,7 @@ import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
 import com.multi.blogging.multiblogging.board.exception.BoardNotFoundException;
 import com.multi.blogging.multiblogging.board.exception.BoardPermissionDeniedException;
+import com.multi.blogging.multiblogging.board.exception.BoardTitleConflictException;
 import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
@@ -52,6 +53,11 @@ public class BoardService {
             String thumbnailUrl = uploadImage(thumbNailImage);
             board.setThumbnailUrl(thumbnailUrl);
         }
+        if (board.getCategory()!=null){
+            if (isDuplicateTitleInCategory(board.getCategory(), boardRequestDto.getTitle())){
+                throw new BoardTitleConflictException();
+            }
+        }
 
         board.setTitle(boardRequestDto.getTitle());
         board.setContent(boardRequestDto.getContent());
@@ -73,7 +79,9 @@ public class BoardService {
         if (!hasPermissionOfCategory(category)){
             throw new CategoryAccessPermissionDeniedException();
         }
-
+        if (isDuplicateTitleInCategory(category, requestDto.getTitle())){
+            throw new BoardTitleConflictException();
+        }
         var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
 
         String thumbnailUrl = makeThumbnailUrl(thumbNailImage, requestDto.getContent());
@@ -106,6 +114,11 @@ public class BoardService {
     private boolean hasPermissionOfCategory(Category category){
         return category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail());
     }
+
+    private boolean isDuplicateTitleInCategory(Category category,String boardTitle){
+        return category.getBoards().stream().anyMatch((board1 -> board1.getTitle().equals(boardTitle)));
+    }
+
     private String makeDefaultThumb(String content) {
         Document doc = Jsoup.parse(content);
 

@@ -58,7 +58,6 @@ import static j2html.TagCreator.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -89,7 +88,7 @@ class BoardControllerTest {
 
     Long categoryId;
 
-    private void setAuthNewUser(){
+    private void setAuthNewUser() {
         MemberSignUpRequestDto memberSignUpRequestDto = new MemberSignUpRequestDto();
         memberSignUpRequestDto.setEmail("abc@abc.com");
         memberSignUpRequestDto.setPassword("1234");
@@ -98,7 +97,7 @@ class BoardControllerTest {
 
         SecurityContext context = SecurityContextHolder.getContext();
         UserDetails user = userDetailsService.loadUserByUsername("abc@abc.com");
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, "sampleToken", user.getAuthorities()));
     }
 
 
@@ -124,12 +123,12 @@ class BoardControllerTest {
     }
 
     @Test
-    void 게시물_수정_삭제_권한체크() throws Exception{
+    void 게시물_수정_삭제_권한체크() throws Exception {
         BoardRequestDto boardRequestDto = new BoardRequestDto();
         boardRequestDto.setTitle("title");
         boardRequestDto.setContent(String.valueOf(html(body(h1("hello world")))));
         boardRequestDto.setCategoryId(categoryId);
-        var result=mockMvc.perform(multipart("/board")
+        var result = mockMvc.perform(multipart("/board")
                         .file(new MockMultipartFile("boardRequestDto",
                                 "dto",
                                 "application/json",
@@ -145,7 +144,7 @@ class BoardControllerTest {
         SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
 
         MockMultipartHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart("/board/{id}",boardId);
+                MockMvcRequestBuilders.multipart("/board/{id}", boardId);
         builder.with(new RequestPostProcessor() {
             @Override
             public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
@@ -154,16 +153,68 @@ class BoardControllerTest {
             }
         });
         mockMvc.perform(builder.file(new MockMultipartFile("boardRequestDto",
-                "dto",
-                "application/json",
-                objectMapper.writeValueAsString(boardRequestDto).getBytes(StandardCharsets.UTF_8))).with(user))
+                        "dto",
+                        "application/json",
+                        objectMapper.writeValueAsString(boardRequestDto).getBytes(StandardCharsets.UTF_8))).with(user))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(delete("/board/{id}",boardId)
+        mockMvc.perform(delete("/board/{id}", boardId)
                         .with(user))
                 .andExpect(status().isForbidden());
 
-        assertEquals(1,boardRepository.findAll().size());
+        assertEquals(1, boardRepository.findAll().size());
+    }
+
+    @Test
+    void 게시물안의_카테고리_제목_중복체크() throws Exception {
+        BoardRequestDto boardRequestDto1 = new BoardRequestDto();
+        boardRequestDto1.setTitle("title1");
+        boardRequestDto1.setContent(String.valueOf(html(body(h1("hello world")))));
+        boardRequestDto1.setCategoryId(categoryId);
+        var result = mockMvc.perform(multipart("/board")
+                        .file(new MockMultipartFile("boardRequestDto",
+                                "dto",
+                                "application/json",
+                                objectMapper.writeValueAsString(boardRequestDto1).getBytes(StandardCharsets.UTF_8)))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn();
+        Long board1Id = ((Number) JsonPath.read(result.getResponse().getContentAsString(), "$.data.id")).longValue();
+
+
+        BoardRequestDto boardRequestDto2 = new BoardRequestDto();
+        boardRequestDto2.setTitle("title1");
+        boardRequestDto2.setContent(String.valueOf(html(body(h1("hello world")))));
+        boardRequestDto2.setCategoryId(categoryId);
+
+        mockMvc.perform(multipart("/board")
+                        .file(new MockMultipartFile("boardRequestDto",
+                                "dto",
+                                "application/json",
+                                objectMapper.writeValueAsString(boardRequestDto2).getBytes(StandardCharsets.UTF_8)))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict()).andReturn();
+
+
+        var builder =
+                MockMvcRequestBuilders.multipart("/board/{id}", board1Id);
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+
+        mockMvc.perform(builder.file(new MockMultipartFile("boardRequestDto",
+                                "dto",
+                                "application/json",
+                                objectMapper.writeValueAsString(boardRequestDto2).getBytes(StandardCharsets.UTF_8)))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -171,7 +222,7 @@ class BoardControllerTest {
     void getBoards() throws Exception {
         for (int i = 0; i < 10; i++) {
             BoardRequestDto boardRequestDto = new BoardRequestDto();
-            boardRequestDto.setTitle("title");
+            boardRequestDto.setTitle("title"+i);
             boardRequestDto.setContent(String.valueOf(html(body(h1("hello world")))));
             boardRequestDto.setCategoryId(categoryId);
             mockMvc.perform(multipart("/board")
@@ -190,7 +241,7 @@ class BoardControllerTest {
             LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
             requestParams.add("page", Integer.toString(i));
             requestParams.add("size", Integer.toString(5));
-            var result=mockMvc.perform(get("/board/all").params(requestParams))
+            var result = mockMvc.perform(get("/board/all").params(requestParams))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.content", hasSize(5)))
                     .andDo(print()).andReturn();
@@ -200,8 +251,8 @@ class BoardControllerTest {
             createdDateList.addAll(createdDateStrList.stream().map(LocalDateTime::parse).toList());
         }
 
-        for (int i=1;i<createdDateList.size();i++){
-            assertTrue(createdDateList.get(i-1).isAfter(createdDateList.get(i)));
+        for (int i = 1; i < createdDateList.size(); i++) {
+            assertTrue(createdDateList.get(i - 1).isAfter(createdDateList.get(i)));
         }
     }
 
