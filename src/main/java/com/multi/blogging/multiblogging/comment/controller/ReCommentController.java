@@ -8,6 +8,7 @@ import com.multi.blogging.multiblogging.comment.service.ReCommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,8 +19,8 @@ public class ReCommentController {
 
     @PostMapping("/parent/{parent_id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ReCommentResponseDto> writeReComment(@PathVariable("parent_id") Long parentId, @Valid @RequestBody ReCommentRequestDto reCommentRequestDto) {
-        ReComment reComment= reCommentService.writeReComment(parentId, reCommentRequestDto.getContent());
+    public ApiResponse<ReCommentResponseDto> writeReComment(@PathVariable("parent_id") Long parentId, @Valid @RequestBody ReCommentRequestDto reCommentRequestDto, Authentication authentication) {
+        ReComment reComment= reCommentService.writeReComment(parentId, reCommentRequestDto.getContent(), authentication.getName());
         return ApiResponse.createSuccess(ReCommentResponseDto.of(reComment));
     }
 

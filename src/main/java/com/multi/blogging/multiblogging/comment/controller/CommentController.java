@@ -9,7 +9,10 @@ import com.multi.blogging.multiblogging.comment.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/comment")
@@ -17,10 +20,17 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
+
+    @GetMapping("/board/{board_id}")
+    ApiResponse<List<CommentResponseDto>> getComments(@PathVariable("board_id") Long boardId){
+        List<Comment> comments = commentService.getComments(boardId);
+        return ApiResponse.createSuccess(comments.stream().map(CommentResponseDto::of).toList());
+    }
+
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    ApiResponse<CommentResponseDto> writeComment(@Valid @RequestBody CommentRequestDto commentRequestDto){
-        Comment comment = commentService.writeComment(commentRequestDto.getBoardId(), commentRequestDto.getContent());
+    ApiResponse<CommentResponseDto> writeComment(@Valid @RequestBody CommentRequestDto commentRequestDto, Authentication authentication){
+        Comment comment = commentService.writeComment(commentRequestDto.getBoardId(), commentRequestDto.getContent(),authentication.getName());
 
         return ApiResponse.createSuccess(CommentResponseDto.of(comment));
     }

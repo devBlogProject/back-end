@@ -42,9 +42,8 @@ public class MemberService {
 
 
     @Transactional
-    public Member modifyNickName(String nickName) {
-        String email = SecurityUtil.getCurrentMemberEmail();
-        Optional<Member> member = memberRepository.findOneByEmail(email);
+    public Member modifyNickName(String nickName,String memberEmail) {
+        Optional<Member> member = memberRepository.findOneByEmail(memberEmail);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
@@ -56,8 +55,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void modifyPassword(String oldPassword, String newPassword) {
-        Optional<Member> member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail());
+    public void modifyPassword(String oldPassword, String newPassword,String memberEmail) {
+        Optional<Member> member = memberRepository.findOneByEmail(memberEmail);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
@@ -78,8 +77,8 @@ public class MemberService {
     }
 
     @Transactional
-    public Member updateMemberProfileImage(MultipartFile image){
-        Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+    public Member updateMemberProfileImage(MultipartFile image,String memberEmail){
+        Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
         String imageUrl = imageUploadService.uploadFile(image);
         member.setImageUrl(imageUrl);
         return member;

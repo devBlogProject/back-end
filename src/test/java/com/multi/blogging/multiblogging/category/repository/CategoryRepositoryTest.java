@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -34,7 +34,7 @@ class CategoryRepositoryTest {
     @BeforeEach
     void setUp(){
         memberRepository.save(Member.builder()
-                .email(TEST_EMAIL).password("1234").build());
+                .email(TEST_EMAIL).password(TEST_PASSWORD).nickName(TEST_NICK).build());
     }
 
     @Test
@@ -104,8 +104,8 @@ class CategoryRepositoryTest {
         Category category4 = new Category("test4", member2);
         categoryRepository.save(category4);
 
-        assertEquals(categoryRepository.findTopCategoriesWithMember(member1).size(),3);
-        assertEquals(categoryRepository.findTopCategoriesWithMember(member2).size(),1);
+        assertEquals(categoryRepository.findTopCategoriesWithChildCategoriesByMemberNickname(member1.getNickName()).size(),3);
+        assertEquals(categoryRepository.findTopCategoriesWithChildCategoriesByMemberNickname(member2.getNickName()).size(),1);
     }
 
 //    @Test

@@ -24,7 +24,7 @@ public class CustomReCommentRepositoryImpl implements CustomReCommentRepository 
     @Override
     public Optional<ReComment> findByIdWithMember(Long id) {
         return Optional.ofNullable(queryFactory.selectFrom(reComment)
-                .join(reComment.member, member).fetchJoin()
+                .leftJoin(reComment.member, member).fetchJoin()
                 .where(reComment.id.eq(id))
                 .fetchOne());
     }

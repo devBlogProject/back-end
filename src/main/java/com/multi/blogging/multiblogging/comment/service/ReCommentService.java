@@ -21,8 +21,8 @@ public class ReCommentService {
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
 
-    public ReComment writeReComment(Long parentId, String content){
-        Member member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+    public ReComment writeReComment(Long parentId, String content,String memberEmail){
+        Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
         Comment parent = commentRepository.findById(parentId).orElseThrow(CommentNotFoundException::new);
         ReComment reComment= ReComment.builder()
                 .content(content)
@@ -34,7 +34,7 @@ public class ReCommentService {
     }
 
     public ReComment updateReComment(Long id,String content){
-        var reComment = reCommentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+        var reComment = reCommentRepository.findByIdWithMember(id).orElseThrow(CommentNotFoundException::new);
         reComment.setContent(content);
         return reComment;
     }

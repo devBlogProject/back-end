@@ -67,11 +67,8 @@ class MemberServiceTest {
 
         when(imageUploadService.uploadFile(multipartFile)).thenReturn("http://sample.com");
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        UserDetails user = userDetailsService.loadUserByUsername(member.getEmail());
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user,"sampleToken",user.getAuthorities()));
 
-        memberService.updateMemberProfileImage(requestDto.getImage());
+        memberService.updateMemberProfileImage(requestDto.getImage(),TEST_EMAIL);
 
         var findMember =memberRepository.findOneByEmail(TEST_EMAIL);
         assertEquals("http://sample.com",findMember.get().getImageUrl());
