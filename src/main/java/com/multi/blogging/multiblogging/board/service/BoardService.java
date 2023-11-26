@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -36,32 +38,33 @@ public class BoardService {
 
 
     @Transactional(readOnly = true)
-    public Board getBoard(Long boardId){
-        return boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+    public Board getBoard(Long boardId) {
+        return boardRepository.findByIdWithMember(boardId).orElseThrow(BoardNotFoundException::new);
     }
 
     @Transactional
-    public void deleteBoard(Long boardId){
+    public void deleteBoard(Long boardId) {
         var board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
         boardRepository.delete(board);
     }
 
     @Transactional
-    public Board updateBoard(Long boardId,BoardRequestDto boardRequestDto,MultipartFile thumbNailImage){
-        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        if (thumbNailImage!=null){
+    public Board updateBoard(Long boardId, BoardRequestDto boardRequestDto, MultipartFile thumbNailImage) {
+        Board board = boardRepository.findByIdWithCategoryAndMember(boardId).orElseThrow(BoardNotFoundException::new);
+        if (thumbNailImage != null) {
             String thumbnailUrl = uploadImage(thumbNailImage);
             board.setThumbnailUrl(thumbnailUrl);
         }
-        if (board.getCategory()!=null){
-            if (isDuplicateTitleInCategory(board.getCategory(), boardRequestDto.getTitle())){
+        if (board.getCategory() != null) {
+            Category categoryHavingBoard = categoryRepository.findByIdWithMemberAndBoard(board.getCategory().getId()).orElseThrow(CategoryNotFoundException::new);
+            if (isDuplicateTitleInCategory(categoryHavingBoard, boardRequestDto.getTitle())) {
                 throw new BoardTitleConflictException();
             }
         }
 
         board.setTitle(boardRequestDto.getTitle());
         board.setContent(boardRequestDto.getContent());
-        if (boardRequestDto.getCategoryId()!=board.getCategory().getId()){
+        if (!Objects.equals(boardRequestDto.getCategoryId(), board.getCategory().getId())) {
             Category category = categoryRepository.findById(boardRequestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
             board.changeCategory(category);
         }
@@ -69,53 +72,53 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<Board> getBoards(Pageable pageable){
-        return boardRepository.findSliceBy(pageable);
+    public Slice<Board> getBoards(Pageable pageable) {
+        return boardRepository.findSliceWithMember(pageable);
     }
 
     @Transactional
-    public Board writeBoard(BoardRequestDto requestDto,MultipartFile thumbNailImage){
-        var category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
-        if (!hasPermissionOfCategory(category)){
+    public Board writeBoard(BoardRequestDto requestDto, MultipartFile thumbNailImage, String memberEmail) {
+        var category = categoryRepository.findByIdWithMemberAndBoard(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
+        if (!hasPermissionOfCategory(category, memberEmail)) {
             throw new CategoryAccessPermissionDeniedException();
         }
-        if (isDuplicateTitleInCategory(category, requestDto.getTitle())){
+        if (isDuplicateTitleInCategory(category, requestDto.getTitle())) {
             throw new BoardTitleConflictException();
         }
-        var author = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
 
         String thumbnailUrl = makeThumbnailUrl(thumbNailImage, requestDto.getContent());
 
         Board board = Board.builder()
-                .author(author)
+                .author(category.getMember())
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .thumbnailUrl(thumbnailUrl)
                 .category(category)
                 .build();
 
-    return boardRepository.save(board);
+        return boardRepository.save(board);
     }
 
-    public String uploadImage(MultipartFile image){
+    public String uploadImage(MultipartFile image) {
         return imageUploadService.uploadFile(image);
     }
 
 
-    private String makeThumbnailUrl(MultipartFile thumbnailImage, String content){
+    private String makeThumbnailUrl(MultipartFile thumbnailImage, String content) {
         String thumbnailUrl;
-        if (thumbnailImage!=null){
+        if (thumbnailImage != null) {
             thumbnailUrl = imageUploadService.uploadFile(thumbnailImage);
-        }else{
+        } else {
             thumbnailUrl = makeDefaultThumb(content);
         }
         return thumbnailUrl;
     }
-    private boolean hasPermissionOfCategory(Category category){
-        return category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail());
+
+    private boolean hasPermissionOfCategory(Category category, String memberEmail) {
+        return category.getMember().getEmail().equals(memberEmail);
     }
 
-    private boolean isDuplicateTitleInCategory(Category category,String boardTitle){
+    private boolean isDuplicateTitleInCategory(Category category, String boardTitle) {
         return category.getBoards().stream().anyMatch((board1 -> board1.getTitle().equals(boardTitle)));
     }
 
@@ -125,10 +128,10 @@ public class BoardService {
         // "img" 태그를 모두 선택합니다.
         Elements images = doc.select("img");
 
-       if (images.isEmpty()){
-           return DEFAULT_THUMB_URL;
-       }else{
-           return images.get(0).attr("src");
-       }
+        if (images.isEmpty()) {
+            return DEFAULT_THUMB_URL;
+        } else {
+            return images.get(0).attr("src");
+        }
     }
 }

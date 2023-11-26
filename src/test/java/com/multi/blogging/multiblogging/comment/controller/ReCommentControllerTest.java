@@ -74,15 +74,15 @@ class ReCommentControllerTest {
         memberSignUpRequestDto.setPassword(TEST_PASSWORD);
         memberSignUpRequestDto.setNickName(TEST_NICK);
         member = memberService.signUp(memberSignUpRequestDto);
-        category = categoryService.addTopCategory("title");
+        category = categoryService.addTopCategory("title",TEST_EMAIL);
 
         BoardRequestDto boardRequestDto = new BoardRequestDto();
         boardRequestDto.setCategoryId(category.getId());
         boardRequestDto.setContent("content");
         boardRequestDto.setTitle("title");
-        board = boardService.writeBoard(boardRequestDto, null);
+        board = boardService.writeBoard(boardRequestDto, null,TEST_EMAIL);
 
-        parentComment = commentService.writeComment(board.getId(), "parent comment");
+        parentComment = commentService.writeComment(board.getId(), "parent comment",TEST_EMAIL);
     }
 
     @Test
@@ -95,9 +95,9 @@ class ReCommentControllerTest {
                 .content(objectMapper.writeValueAsString(reCommentRequestDto)))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/board/{id}",board.getId()))
+        mockMvc.perform(get("/comment/board/{id}",board.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.parentComments[0].reComments[0].content").value("child"))
+                .andExpect(jsonPath("$.data[0].reComments[0].content").value("child"))
                 .andDo(print());
     }
 

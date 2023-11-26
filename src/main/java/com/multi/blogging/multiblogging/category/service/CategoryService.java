@@ -2,9 +2,7 @@ package com.multi.blogging.multiblogging.category.service;
 
 import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
 import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
-import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.category.domain.Category;
-import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermissionDeniedException;
 import com.multi.blogging.multiblogging.category.exception.CategoryDuplicateException;
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +20,8 @@ public class CategoryService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Category addTopCategory(String title) {
-        var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
+    public Category addTopCategory(String title,String memberEmail) {
+        var member = memberRepository.findOneByEmailWithCategories(memberEmail).orElseThrow(MemberNotFoundException::new);
         List<Category> topCategories= member.getCategories().stream().filter(category -> category.getParent()==null).toList();
         if (isDuplicate(topCategories,title)) {
             throw new CategoryDuplicateException();
@@ -37,9 +34,9 @@ public class CategoryService {
     }
 
     @Transactional
-    public Category addChildCategory(Long parentCategoryId,String title) {
-        var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-        Category parentCategory = categoryRepository.findById(parentCategoryId).orElseThrow(CategoryNotFoundException::new);
+    public Category addChildCategory(Long parentCategoryId,String title,String memberEmail) {
+        var member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
+        Category parentCategory = categoryRepository.findByIdWithChildCategories(parentCategoryId).orElseThrow(CategoryNotFoundException::new);
         if (isDuplicate(parentCategory.getChildrenCategories(),title)){
             throw new CategoryDuplicateException();
         }
@@ -53,17 +50,21 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public List<Category> getTopCategories(String nickname){
-        var member = memberRepository.findByNickName(nickname).orElseThrow(MemberNotFoundException::new);
-        return categoryRepository.findTopCategoriesWithMember(member);
+        List<Category> categories1 = categoryRepository.findTopCategoriesWithChildCategoriesByMemberNickname(nickname);
+        List<Category> categories2 = categoryRepository.findTopCategoriesWithBoardByMemberNickname(nickname);
+        for (int i=0;i<categories1.size();i++){
+            categories1.get(i).setBoards(categories2.get(i).getBoards());
+        }
+        return categories1;
     }
 
     @Transactional
-    public Category updateCategory(String title,Long categoryId){
-        var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+    public Category updateCategory(String title,Long categoryId,String memberEmail){
+        var category = categoryRepository.findByIdWithParentCategory(categoryId).orElseThrow(CategoryNotFoundException::new);
         List<Category> siblingCategories;
         if (category.getParent()==null){
-            var member = memberRepository.findOneByEmail(SecurityUtil.getCurrentMemberEmail()).orElseThrow(MemberNotFoundException::new);
-            siblingCategories=categoryRepository.findTopCategoriesWithMember(member);
+            var member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
+            siblingCategories=categoryRepository.findTopCategoriesWithChildCategoriesByMemberNickname(member.getNickName());
         }else{
             siblingCategories = category.getParent().getChildrenCategories();
         }

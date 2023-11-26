@@ -26,13 +26,13 @@ public class CategoryAuthInterceptor implements HandlerInterceptor {
 
         if (httpMethod.equals("PATCH") || httpMethod.equals("DELETE")) {
             Long categoryId = Long.parseLong((String) pathVariables.get("category_id"));
-            var category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+            var category = categoryRepository.findByIdWithMember(categoryId).orElseThrow(CategoryNotFoundException::new);
             if (!category.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())) {
                 throw new CategoryAccessPermissionDeniedException();
             }
         }else if (httpMethod.equals("POST")&& existPathVariable(request,"/category/{parent_id}")){
             Long parentId = Long.parseLong((String) pathVariables.get("parent_id"));
-            var parentCategory = categoryRepository.findById(parentId).orElseThrow(CategoryAccessPermissionDeniedException::new);
+            var parentCategory = categoryRepository.findByIdWithMember(parentId).orElseThrow(CategoryNotFoundException::new);
             if (!parentCategory.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
                 throw new CategoryAccessPermissionDeniedException();
             }

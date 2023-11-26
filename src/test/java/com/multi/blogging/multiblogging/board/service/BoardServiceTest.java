@@ -68,13 +68,12 @@ class BoardServiceTest {
     private MockMultipartFile imageFile = new MockMultipartFile("image", "image.jpg", "image/jpg", "<<jpg data>>".getBytes());
 
     @Test
-    @WithMockUser(username = TEST_EMAIL)
     void 썸네일_없이_콘텐츠에_이미지도_없이_업로드() {
         Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
         Category testCategory = new Category("test", testMember);
         given(imageUploadService.uploadFile(any(MultipartFile.class))).willReturn("http://image.file");
         given(memberRepository.findOneByEmail(anyString())).willReturn(Optional.of(testMember));
-        given(categoryRepository.findById(anyLong())).willReturn(Optional.of(testCategory));
+        given(categoryRepository.findByIdWithMemberAndBoard(anyLong())).willReturn(Optional.of(testCategory));
         given(boardRepository.save(any())).willAnswer((Answer<Board>) invocation -> {
             Object[] args = invocation.getArguments();
             return (Board) args[0];  // 첫 번째 인자를 반환
@@ -84,7 +83,7 @@ class BoardServiceTest {
         boardRequestDto.setCategoryId(1L);
         boardRequestDto.setTitle("test_board");
         boardRequestDto.setContent("<html><body></body></html>");
-        Board writedBoard = boardService.writeBoard(boardRequestDto, null);
+        Board writedBoard = boardService.writeBoard(boardRequestDto, null,TEST_EMAIL);
 
         assertEquals(writedBoard.getAuthor(), testMember);
         assertEquals(writedBoard.getCategory(), testCategory);
@@ -92,13 +91,12 @@ class BoardServiceTest {
     }
 
     @Test
-    @WithMockUser(username = TEST_EMAIL)
     void 썸네일_없이_콘텐츠에_이미지_있을때_업로드(){
         Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
         Category testCategory = new Category("test", testMember);
         given(imageUploadService.uploadFile(any(MultipartFile.class))).willReturn("http://image.file");
         given(memberRepository.findOneByEmail(anyString())).willReturn(Optional.of(testMember));
-        given(categoryRepository.findById(anyLong())).willReturn(Optional.of(testCategory));
+        given(categoryRepository.findByIdWithMemberAndBoard(anyLong())).willReturn(Optional.of(testCategory));
         given(boardRepository.save(any())).willAnswer(new Answer<Board>() {
             @Override
             public Board answer(InvocationOnMock invocation) throws Throwable {
@@ -121,7 +119,7 @@ class BoardServiceTest {
         boardRequestDto.setCategoryId(1L);
         boardRequestDto.setTitle("test_board");
         boardRequestDto.setContent(content);
-        Board writedBoard = boardService.writeBoard(boardRequestDto, null);
+        Board writedBoard = boardService.writeBoard(boardRequestDto, null,TEST_EMAIL);
 
         assertEquals(writedBoard.getAuthor(), testMember);
         assertEquals(writedBoard.getCategory(), testCategory);
@@ -129,13 +127,12 @@ class BoardServiceTest {
     }
 
     @Test
-    @WithMockUser(username = TEST_EMAIL)
     void 썸네일_있을때_업로드(){
         Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
         Category testCategory = new Category("test", testMember);
         given(imageUploadService.uploadFile(any(MultipartFile.class))).willReturn("http://image.file");
         given(memberRepository.findOneByEmail(anyString())).willReturn(Optional.of(testMember));
-        given(categoryRepository.findById(anyLong())).willReturn(Optional.of(testCategory));
+        given(categoryRepository.findByIdWithMemberAndBoard(anyLong())).willReturn(Optional.of(testCategory));
         given(boardRepository.save(any())).willAnswer(new Answer<Board>() {
             @Override
             public Board answer(InvocationOnMock invocation) throws Throwable {
@@ -158,7 +155,7 @@ class BoardServiceTest {
         boardRequestDto.setCategoryId(1L);
         boardRequestDto.setTitle("test_board");
         boardRequestDto.setContent(content);
-        Board writedBoard = boardService.writeBoard(boardRequestDto, imageFile);
+        Board writedBoard = boardService.writeBoard(boardRequestDto, imageFile,TEST_EMAIL);
 
         assertEquals(writedBoard.getAuthor(), testMember);
         assertEquals(writedBoard.getCategory(), testCategory);

@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.multi.blogging.multiblogging.auth.domain.QMember.member;
+import static com.multi.blogging.multiblogging.category.domain.QCategory.category;
 
 @RequiredArgsConstructor
 @Component
@@ -24,5 +26,14 @@ public class CustomMemberRepositoryImpl implements CustomMemberRepository {
                 .selectFrom(member)
                 .where(member.nickName.startsWith(nickName))
                 .fetch();
+    }
+
+    @Override
+    public Optional<Member> findOneByEmailWithCategories(String email) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(member)
+                .leftJoin(member.categories,category).fetchJoin()
+                .where(member.email.eq(email))
+                .fetchOne());
     }
 }

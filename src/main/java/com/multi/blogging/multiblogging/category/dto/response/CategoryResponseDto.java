@@ -1,8 +1,6 @@
 package com.multi.blogging.multiblogging.category.dto.response;
 
 import com.multi.blogging.multiblogging.base.BaseResponseDto;
-;
-import com.multi.blogging.multiblogging.board.dto.response.BoardResponseDto;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import lombok.Builder;
 import lombok.Data;

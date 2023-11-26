@@ -24,11 +24,10 @@ public class BoardResponseDto extends BaseResponseDto {
 //    LocalDateTime createdDate;
 //    LocalDateTime updatedTime;
 
-    private List<CommentResponseDto> parentComments = new ArrayList<>();
 
 
     @Builder
-    public BoardResponseDto(Long id, String title, String content, Long categoryId, String thumbnailUrl, MemberResponseDto authorResponseDto, LocalDateTime createdDate, LocalDateTime updatedDate, List<CommentResponseDto> commentResponseDtoList){
+    public BoardResponseDto(Long id, String title, String content, Long categoryId, String thumbnailUrl, MemberResponseDto authorResponseDto, LocalDateTime createdDate, LocalDateTime updatedDate){
         this.id=id;
         this.title=title;
         this.content = content;
@@ -37,7 +36,6 @@ public class BoardResponseDto extends BaseResponseDto {
         this.author = authorResponseDto;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
-        this.parentComments= commentResponseDtoList;
     }
 
     public static BoardResponseDto of(Board board) {
@@ -50,7 +48,6 @@ public class BoardResponseDto extends BaseResponseDto {
                 .createdDate(board.getCreatedDate())
                 .updatedDate(board.getUpdatedDate())
                 .authorResponseDto(MemberResponseDto.of(board.getAuthor()))
-                .commentResponseDtoList(board.getParentCommentList().stream().map(CommentResponseDto::of).toList())
                 .build();
     }
 }

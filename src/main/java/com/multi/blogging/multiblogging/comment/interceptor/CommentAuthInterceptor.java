@@ -26,7 +26,7 @@ public class CommentAuthInterceptor implements HandlerInterceptor {
         if (httpMethod.equals("PATCH") || httpMethod.equals("DELETE")) {
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long commentId = Long.parseLong((String) pathVariables.get("comment_id"));
-            Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+            Comment comment = commentRepository.findByIdWithMember(commentId).orElseThrow(CommentNotFoundException::new);
             if (!comment.getMember().getEmail().equals(SecurityUtil.getCurrentMemberEmail())) {
                 throw new CommentPermissionDeniedException();
             }

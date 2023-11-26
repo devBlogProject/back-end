@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,8 +33,8 @@ public class BoardController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<BoardResponseDto> writeBoard(@RequestPart(required = false)   MultipartFile thumbnail,
-                                                    @Valid @RequestPart BoardRequestDto boardRequestDto){
-        Board writedBoard = boardService.writeBoard(boardRequestDto, thumbnail);
+                                                    @Valid @RequestPart BoardRequestDto boardRequestDto, Authentication authentication){
+        Board writedBoard = boardService.writeBoard(boardRequestDto, thumbnail,authentication.getName());
         return ApiResponse.createSuccess(BoardResponseDto.of(writedBoard));
     }
 

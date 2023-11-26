@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET,"/category/{nickname}/all").permitAll()
                         .requestMatchers(HttpMethod.GET,"/board/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/comment/**").permitAll()
                         .anyRequest().authenticated())
 //                //== 소셜 로그인 설정 ==//
 //                .oauth2Login(Customizer.withDefaults())

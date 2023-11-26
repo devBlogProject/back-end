@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,22 +25,22 @@ public class MemberController {
     private final MemberService memberService;
 
     @PatchMapping("/nickname")
-    public ApiResponse<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto) {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto.getNickName()));
+    public ApiResponse<MemberResponseDto> modifyNickName(@Valid @RequestBody ModifyNickNameRequestDto modifyNickNameRequestDto,Authentication authentication) {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.modifyNickName(modifyNickNameRequestDto.getNickName(), authentication.getName()));
         return ApiResponse.createSuccess(dto);
     }
 
     @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<MemberResponseDto> updateProfileImage(
             @Parameter(description = "multipart/form-data 형식의 이미지 리스트를 input으로 받습니다. 이때 key 값은 image 입니다.")
-            @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto) {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto.getImage()));
+            @ModelAttribute UpdateProfileImageRequestDto updateProfileImageRequestDto, Authentication authentication) {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.updateMemberProfileImage(updateProfileImageRequestDto.getImage(),authentication.getName()));
         return ApiResponse.createSuccess(dto);
     }
 
     @PatchMapping("/password")
-    public ApiResponse<?> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto) {
-        memberService.modifyPassword(modifyPasswordRequestDto.getOldPassword(), modifyPasswordRequestDto.getNewPassword());
+    public ApiResponse<?> modifyPassword(@Valid @RequestBody ModifyPasswordRequestDto modifyPasswordRequestDto,Authentication authentication) {
+        memberService.modifyPassword(modifyPasswordRequestDto.getOldPassword(), modifyPasswordRequestDto.getNewPassword(),authentication.getName());
         return ApiResponse.createSuccessWithNoContent();
     }
 

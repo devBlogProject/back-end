@@ -74,13 +74,13 @@ class CommentControllerTest {
         memberSignUpRequestDto.setPassword(TEST_PASSWORD);
         memberSignUpRequestDto.setNickName(TEST_NICK);
         member = memberService.signUp(memberSignUpRequestDto);
-        category=categoryService.addTopCategory("title");
+        category=categoryService.addTopCategory("title",TEST_EMAIL);
 
         BoardRequestDto boardRequestDto = new BoardRequestDto();
         boardRequestDto.setCategoryId(category.getId());
                 boardRequestDto.setContent("content");
                 boardRequestDto.setTitle("title");
-        board =boardService.writeBoard(boardRequestDto, null);
+        board =boardService.writeBoard(boardRequestDto, null,TEST_EMAIL);
 
     }
 
@@ -102,7 +102,7 @@ class CommentControllerTest {
     @Test
     @WithMockUser(username = TEST_EMAIL)
     void updateComment() throws  Exception{
-        Comment comment = commentService.writeComment(board.getId(), "comment");
+        Comment comment = commentService.writeComment(board.getId(), "comment",TEST_EMAIL);
 
         CommentUpdateRequestDto commentUpdateRequestDto = new CommentUpdateRequestDto();
         commentUpdateRequestDto.setContent("updateComment");
@@ -132,7 +132,7 @@ class CommentControllerTest {
         Long commentId= ((Number)JsonPath.read(response,"$.data.id")).longValue();
 
         setAuthNewUser();
-        SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
+        var user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
         mockMvc.perform(delete("/comment/{id}", commentId)
                         .with(user)
                         .contentType(MediaType.APPLICATION_JSON))

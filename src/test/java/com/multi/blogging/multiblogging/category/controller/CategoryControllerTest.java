@@ -86,15 +86,15 @@ class CategoryControllerTest {
     @WithMockUser(username = TEST_EMAIL)
     @Transactional
     void getCategories() throws Exception {
-        Category parent1=categoryService.addTopCategory("parent1");
-        Category parent2=categoryService.addTopCategory("parent2");
-        Category parent3=categoryService.addTopCategory("parent3");
+        Category parent1=categoryService.addTopCategory("parent1",TEST_EMAIL);
+        Category parent2=categoryService.addTopCategory("parent2",TEST_EMAIL);
+        Category parent3=categoryService.addTopCategory("parent3",TEST_EMAIL);
 
 
-        categoryService.addChildCategory(parent1.getId(),"child1");
-        categoryService.addChildCategory(parent1.getId(),"child2");
-        categoryService.addChildCategory(parent1.getId(),"child3");
-        categoryService.addChildCategory(parent1.getId(),"child4");
+        categoryService.addChildCategory(parent1.getId(),"child1",TEST_EMAIL);
+        categoryService.addChildCategory(parent1.getId(),"child2",TEST_EMAIL);
+        categoryService.addChildCategory(parent1.getId(),"child3",TEST_EMAIL);
+        categoryService.addChildCategory(parent1.getId(),"child4",TEST_EMAIL);
 
         String uri = String.format("/category/%s/all",TEST_NICK);
         mockMvc.perform(get(uri))
@@ -108,7 +108,7 @@ class CategoryControllerTest {
     @WithMockUser(username = TEST_EMAIL)
     @Transactional
     void 업데이트카테고리() throws Exception {
-        Category category = categoryService.addTopCategory("parent");
+        Category category = categoryService.addTopCategory("parent",TEST_EMAIL);
         CategoryRequestDto requestDto = new CategoryRequestDto();
         requestDto.setTitle("parent1");
 
@@ -124,7 +124,7 @@ class CategoryControllerTest {
     @WithMockUser(username = TEST_EMAIL)
     @Transactional
     void 카테고리권한체크() throws Exception{
-        Category parent1=categoryService.addTopCategory("parent1");
+        Category parent1=categoryService.addTopCategory("parent1",TEST_EMAIL);
 
         setAuthNewUser();
         SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
@@ -184,9 +184,9 @@ class CategoryControllerTest {
     @Transactional
     @WithMockUser(username = TEST_EMAIL)
     void 메소드권한체크() throws Exception {
-        Category parent1=categoryService.addTopCategory("parent1");
-        Category parent2=categoryService.addTopCategory("parent2");
-        Category parent3=categoryService.addTopCategory("parent3");
+        Category parent1=categoryService.addTopCategory("parent1",TEST_EMAIL);
+        Category parent2=categoryService.addTopCategory("parent2",TEST_EMAIL);
+        Category parent3=categoryService.addTopCategory("parent3",TEST_EMAIL);
 
 
         memberRepository.save(Member.builder().email("another_test@test.com").password(TEST_PASSWORD).nickName("another_test_nick").authority(Authority.MEMBER).build());

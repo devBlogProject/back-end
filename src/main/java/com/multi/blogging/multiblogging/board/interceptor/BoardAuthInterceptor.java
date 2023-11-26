@@ -41,7 +41,7 @@ public class BoardAuthInterceptor implements HandlerInterceptor {
             Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             Long boardId = Long.parseLong((String) pathVariables.get("board_id"));
 
-            Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+            Board board = boardRepository.findByIdWithMember(boardId).orElseThrow(BoardNotFoundException::new);
 
             if (!board.getAuthor().getEmail().equals(SecurityUtil.getCurrentMemberEmail())){
                 throw new BoardPermissionDeniedException();
