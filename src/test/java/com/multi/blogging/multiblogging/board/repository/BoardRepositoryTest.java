@@ -60,10 +60,9 @@ class BoardRepositoryTest {
                 .title("title")
                 .content("content")
                 .thumbnailUrl("thumbnail")
-                .author(testMember)
-                .category(testCategory)
                 .postNumber(1)
                 .build();
+        board.changeAuthor(testMember);
         boardRepository.save(board);
 
         assertTrue(boardRepository.findByMemberNicknameAndPostNumberWithMember(testMember.getNickName(), 1).isPresent());
@@ -76,8 +75,6 @@ class BoardRepositoryTest {
                 .title("title")
                 .content("content")
                 .thumbnailUrl("thumbnail")
-                .author(testMember)
-                .category(testCategory)
                 .postNumber(1)
                 .build();
 
@@ -100,8 +97,6 @@ class BoardRepositoryTest {
                     .title("title")
                     .content("content")
                     .thumbnailUrl("thumbnail")
-                    .author(testMember)
-                    .category(testCategory)
                     .postNumber(1)
                     .build();
             boardRepository.save(board);
@@ -128,8 +123,6 @@ class BoardRepositoryTest {
                     .title("title")
                     .content("content")
                     .thumbnailUrl("thumbnail")
-                    .author(testMember)
-                    .category(testCategory)
                     .postNumber(i+1)
                     .build();
             boardRepository.save(board);

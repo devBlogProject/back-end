@@ -25,10 +25,10 @@ public class Board extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, columnDefinition="TEXT")
+    @Column(columnDefinition="TEXT")
     private String content;
 
-    @Column(nullable = false)
+    @Column
     private String thumbnailUrl;
 
     @Column(nullable = false)
@@ -46,12 +46,10 @@ public class Board extends BaseEntity {
     private List<Comment> parentCommentList = new ArrayList<>();
 
     @Builder
-    public Board(String title, String content, Member author, String thumbnailUrl, Category category,int postNumber ) {
+    public Board(String title, String content, String thumbnailUrl,int postNumber ) {
         this.title = title;
         this.content = content;
-        this.changeAuthor(author);
         this.thumbnailUrl = thumbnailUrl;
-        this.changeCategory(category);
         this.postNumber = postNumber;
     }
 

@@ -91,14 +91,13 @@ public class BoardService {
         String thumbnailUrl = makeThumbnailUrl(thumbNailImage, requestDto.getContent());
 
         Board board = Board.builder()
-                .author(category.getMember())
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .thumbnailUrl(thumbnailUrl)
-                .category(category)
                 .postNumber(postNum)
                 .build();
-
+        board.changeAuthor(category.getMember());
+        board.changeCategory(category);
         return boardRepository.save(board);
     }
 
