@@ -20,21 +20,27 @@ public class HeartService {
     private final HeartRepository heartRepository;
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
+
     @Transactional
-    public Heart insert(String memberEmail,Long boardId){
+    public void insert(String memberEmail, Long boardId) {
         Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
         Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        if (heartRepository.findByMemberAndBoard(member.getId(),boardId).isPresent()){
+        if (heartRepository.findByMemberAndBoard(member.getId(), boardId).isPresent()) {
             throw new HeartConflictException();
         }
 
-        return heartRepository.save(Heart.builder().member(member).board(board).build());
+        heartRepository.save(Heart.builder().member(member).board(board).build());
     }
 
     @Transactional
-    public void delete(String memberEmail,Long boardId){
+    public void delete(String memberEmail, Long boardId) {
         Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
         Heart heart = heartRepository.findByMemberAndBoard(member.getId(), boardId).orElseThrow(HeartNotFoundException::new);
         heartRepository.delete(heart);
+    }
+
+    @Transactional(readOnly = true)
+    public int getHearts(Long boardId){
+        return heartRepository.getCountByBoard(boardId);
     }
 }

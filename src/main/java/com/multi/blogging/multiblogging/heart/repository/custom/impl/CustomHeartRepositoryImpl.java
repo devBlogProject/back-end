@@ -39,4 +39,11 @@ public class CustomHeartRepositoryImpl implements CustomHeartRepository {
                                 .and(heart.board.id.eq(boardId)))
                         .fetchOne());
     }
+
+    @Override
+    public int getCountByBoard(Long boardId) {
+        return jpaQueryFactory.selectFrom(heart)
+                .where(heart.board.id.eq(boardId))
+                .fetch().size();
+    }
 }

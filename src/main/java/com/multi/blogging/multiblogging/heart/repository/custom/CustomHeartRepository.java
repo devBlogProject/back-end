@@ -8,4 +8,6 @@ public interface CustomHeartRepository {
     Optional<Heart> findByMemberAndBoard(Long memberId, Long boardId);
 
     Optional<Heart> findByMemberAndBoardWithMember(Long memberId, Long boardId);
+
+    int getCountByBoard(Long boardId);
 }

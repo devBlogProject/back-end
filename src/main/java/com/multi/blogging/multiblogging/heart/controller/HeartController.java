@@ -25,4 +25,9 @@ public class HeartController {
         heartService.delete(SecurityUtil.getCurrentMemberEmail(), boardId);
         return ApiResponse.createSuccessWithNoContent();
     }
+
+    @GetMapping("/board/{board_id}")
+    public ApiResponse<Integer> getHearts(@PathVariable("board_id") Long boardId){
+        return ApiResponse.createSuccess(heartService.getHearts(boardId));
+    }
 }

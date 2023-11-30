@@ -41,6 +41,22 @@ class HeartRepositoryTest {
     }
 
     @Test
+    void 좋아요개수(){
+        for (int i=0;i<5;i++){
+            heartRepository.save(Heart.builder().board(testBoard).build());
+        }
+        Board testBoard2 = Board.builder().title("title2").postNumber(2).build();
+        boardRepository.save(testBoard2);
+
+        for (int i=0;i<3;i++){
+            heartRepository.save(Heart.builder().board(testBoard2).build());
+        }
+
+        assertEquals(5,heartRepository.getCountByBoard(testBoard.getId()));
+        assertEquals(3,heartRepository.getCountByBoard(testBoard2.getId()));
+    }
+
+    @Test
     void findByMemberAndBoard() {
         heartRepository.save(Heart.builder().member(testMember).board(testBoard).build());
         assertTrue(heartRepository.findByMemberAndBoard(testMember.getId(), testBoard.getId()).isPresent());
