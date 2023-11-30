@@ -31,6 +31,9 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private String thumbnailUrl;
 
+    @Column(nullable = false)
+    private int postNumber;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member author;
@@ -43,12 +46,13 @@ public class Board extends BaseEntity {
     private List<Comment> parentCommentList = new ArrayList<>();
 
     @Builder
-    public Board(String title, String content, Member author, String thumbnailUrl, Category category) {
+    public Board(String title, String content, Member author, String thumbnailUrl, Category category,int postNumber ) {
         this.title = title;
         this.content = content;
         this.changeAuthor(author);
         this.thumbnailUrl = thumbnailUrl;
         this.changeCategory(category);
+        this.postNumber = postNumber;
     }
 
     /*

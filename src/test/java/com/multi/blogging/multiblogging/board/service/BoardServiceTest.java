@@ -43,7 +43,6 @@ import static org.mockito.BDDMockito.given;
 import static j2html.TagCreator.*;
 
 
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {BoardService.class})
 @ActiveProfiles("test")
@@ -83,7 +82,7 @@ class BoardServiceTest {
         boardRequestDto.setCategoryId(1L);
         boardRequestDto.setTitle("test_board");
         boardRequestDto.setContent("<html><body></body></html>");
-        Board writedBoard = boardService.writeBoard(boardRequestDto, null,TEST_EMAIL);
+        Board writedBoard = boardService.writeBoard(boardRequestDto, null, TEST_EMAIL);
 
         assertEquals(writedBoard.getAuthor(), testMember);
         assertEquals(writedBoard.getCategory(), testCategory);
@@ -91,7 +90,7 @@ class BoardServiceTest {
     }
 
     @Test
-    void 썸네일_없이_콘텐츠에_이미지_있을때_업로드(){
+    void 썸네일_없이_콘텐츠에_이미지_있을때_업로드() {
         Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
         Category testCategory = new Category("test", testMember);
         given(imageUploadService.uploadFile(any(MultipartFile.class))).willReturn("http://image.file");
@@ -105,7 +104,7 @@ class BoardServiceTest {
             }
         });
 
-        String content =html(
+        String content = html(
                 body(
                         h1("hello, world"),
                         img().withSrc("test_image_1"),
@@ -119,7 +118,7 @@ class BoardServiceTest {
         boardRequestDto.setCategoryId(1L);
         boardRequestDto.setTitle("test_board");
         boardRequestDto.setContent(content);
-        Board writedBoard = boardService.writeBoard(boardRequestDto, null,TEST_EMAIL);
+        Board writedBoard = boardService.writeBoard(boardRequestDto, null, TEST_EMAIL);
 
         assertEquals(writedBoard.getAuthor(), testMember);
         assertEquals(writedBoard.getCategory(), testCategory);
@@ -127,7 +126,7 @@ class BoardServiceTest {
     }
 
     @Test
-    void 썸네일_있을때_업로드(){
+    void 썸네일_있을때_업로드() {
         Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
         Category testCategory = new Category("test", testMember);
         given(imageUploadService.uploadFile(any(MultipartFile.class))).willReturn("http://image.file");
@@ -141,7 +140,7 @@ class BoardServiceTest {
             }
         });
 
-        String content =html(
+        String content = html(
                 body(
                         h1("hello, world"),
                         img().withSrc("test_image_1"),
@@ -155,10 +154,45 @@ class BoardServiceTest {
         boardRequestDto.setCategoryId(1L);
         boardRequestDto.setTitle("test_board");
         boardRequestDto.setContent(content);
-        Board writedBoard = boardService.writeBoard(boardRequestDto, imageFile,TEST_EMAIL);
+        Board writedBoard = boardService.writeBoard(boardRequestDto, imageFile, TEST_EMAIL);
 
         assertEquals(writedBoard.getAuthor(), testMember);
         assertEquals(writedBoard.getCategory(), testCategory);
-        assertEquals(writedBoard.getThumbnailUrl(),"http://image.file");
+        assertEquals(writedBoard.getThumbnailUrl(), "http://image.file");
     }
+
+    @Test
+    void 포스트_넘버_체크() {
+        Member testMember1 = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
+        Category testCategory1 = new Category("test", testMember1);
+        given(categoryRepository.findByIdWithMemberAndBoard(anyLong())).willReturn(Optional.of(testCategory1));
+        given(boardRepository.save(any())).willAnswer(new Answer<Board>() {
+            @Override
+            public Board answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return (Board) args[0];  // 첫 번째 인자를 반환
+            }
+        });
+
+        for (int i = 0; i < 5; i++) {  // 기존 유저 게시물 작성 포스트 넘버 테스트
+            BoardRequestDto boardRequestDto = new BoardRequestDto();
+            boardRequestDto.setCategoryId(1L);
+            boardRequestDto.setTitle("title"+i);
+            boardRequestDto.setContent("any content");
+            assertEquals(i+1,boardService.writeBoard(boardRequestDto, null, TEST_EMAIL).getPostNumber());
+        }
+
+        Member testMember2 = Member.builder().email("another_test@test.com").nickName("another_test_nick").build();
+        Category testCategory2 = new Category("test", testMember2);
+        given(categoryRepository.findByIdWithMemberAndBoard(anyLong())).willReturn(Optional.of(testCategory2));
+
+        for (int i = 0; i < 5; i++) {  // 기존 유저 게시물 작성 포스트 넘버 테스트
+            BoardRequestDto boardRequestDto = new BoardRequestDto();
+            boardRequestDto.setCategoryId(1L);
+            boardRequestDto.setTitle("title"+i);
+            boardRequestDto.setContent("any content");
+            assertEquals(i+1,boardService.writeBoard(boardRequestDto, null, "another_test@test.com").getPostNumber());
+        }
+    }
+
 }

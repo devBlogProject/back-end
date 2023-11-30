@@ -52,9 +52,9 @@ public class BoardController {
         return ApiResponse.createSuccess(BoardResponseDto.of(updatedBoard));
     }
 
-    @GetMapping("/{board_id}")
-    public ApiResponse<BoardResponseDto> getBoard(@PathVariable("board_id") Long boardId){
-        Board board = boardService.getBoard(boardId);
+    @GetMapping("/nickname/{nickname}/post-num/{post_num}")
+    public ApiResponse<BoardResponseDto> getBoard(@PathVariable("nickname") String nickname, @PathVariable("post_num") int postNum){
+        Board board = boardService.getBoard(nickname,postNum);
         return ApiResponse.createSuccess(BoardResponseDto.of(board));
     }
 

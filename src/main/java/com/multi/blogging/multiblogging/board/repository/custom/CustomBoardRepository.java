@@ -13,5 +13,7 @@ public interface CustomBoardRepository {
 
     Optional<Board> findByIdWithMember(Long id);
 
+    Optional<Board> findByMemberNicknameAndPostNumberWithMember(String memberNickname, int postNum);
+
     Slice<Board> findSliceWithMember(Pageable pageable);
 }

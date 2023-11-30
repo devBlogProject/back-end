@@ -272,9 +272,9 @@ class BoardControllerTest {
                 .andExpect(status().isCreated()).andReturn();
         String response = result.getResponse().getContentAsString();
 
-        Long boardId = ((Number) JsonPath.read(response, "$.data.id")).longValue();
+        int postNum= JsonPath.read(response, "$.data.postNum");
 
-        mockMvc.perform(get(String.format("/board/%d", boardId)))
+        mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}",TEST_NICK,postNum))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("title"))
                 .andExpect(jsonPath("$.data.content").value(String.valueOf(html(body(h1("hello world"))))))

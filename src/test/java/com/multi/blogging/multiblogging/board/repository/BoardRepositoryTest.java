@@ -25,8 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
-import static com.multi.blogging.multiblogging.Constant.TEST_PASSWORD;
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -49,10 +48,26 @@ class BoardRepositoryTest {
     Category testCategory;
     @BeforeEach
     void setUp(){
-         testMember = Member.builder().email(TEST_EMAIL).password(TEST_PASSWORD).build();
+         testMember = Member.builder().email(TEST_EMAIL).password(TEST_PASSWORD).nickName(TEST_NICK).build();
         memberRepository.save(testMember);
         testCategory = new Category("title", testMember);
         categoryRepository.save(testCategory);
+    }
+
+    @Test
+    void findByNicknameAndPostNumberWithMember(){
+        Board board = Board.builder()
+                .title("title")
+                .content("content")
+                .thumbnailUrl("thumbnail")
+                .author(testMember)
+                .category(testCategory)
+                .postNumber(1)
+                .build();
+        boardRepository.save(board);
+
+        assertTrue(boardRepository.findByMemberNicknameAndPostNumberWithMember(testMember.getNickName(), 1).isPresent());
+
     }
 
     @Test
@@ -63,6 +78,7 @@ class BoardRepositoryTest {
                 .thumbnailUrl("thumbnail")
                 .author(testMember)
                 .category(testCategory)
+                .postNumber(1)
                 .build();
 
         List<Comment> comments = new ArrayList<>();
@@ -86,6 +102,7 @@ class BoardRepositoryTest {
                     .thumbnailUrl("thumbnail")
                     .author(testMember)
                     .category(testCategory)
+                    .postNumber(1)
                     .build();
             boardRepository.save(board);
             Thread.sleep(100);
@@ -113,6 +130,7 @@ class BoardRepositoryTest {
                     .thumbnailUrl("thumbnail")
                     .author(testMember)
                     .category(testCategory)
+                    .postNumber(i+1)
                     .build();
             boardRepository.save(board);
             Thread.sleep(100);

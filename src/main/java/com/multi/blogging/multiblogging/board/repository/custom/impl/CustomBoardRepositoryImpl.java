@@ -60,6 +60,17 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
     }
 
     @Override
+    public Optional<Board> findByMemberNicknameAndPostNumberWithMember(String memberNickname, int postNum) {
+        return Optional.ofNullable(
+                jpaQueryFactory.selectFrom(board)
+                        .leftJoin(board.author, member).fetchJoin()
+                        .where(board.author.nickName.eq(memberNickname)
+                                .and(board.postNumber.eq(postNum))
+                        ).fetchOne()
+        );
+    }
+
+    @Override
     public Slice<Board> findSliceWithMember(Pageable pageable) {
         List<Board> boardList = jpaQueryFactory.selectFrom(board)
                 .leftJoin(board.author, member).fetchJoin()

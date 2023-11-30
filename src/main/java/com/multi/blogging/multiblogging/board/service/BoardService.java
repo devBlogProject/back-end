@@ -38,8 +38,9 @@ public class BoardService {
 
 
     @Transactional(readOnly = true)
-    public Board getBoard(Long boardId) {
-        return boardRepository.findByIdWithMember(boardId).orElseThrow(BoardNotFoundException::new);
+    public Board getBoard(String nickname,int postNum) {
+        return boardRepository.findByMemberNicknameAndPostNumberWithMember(nickname, postNum).orElseThrow(BoardNotFoundException::new);
+//        return boardRepository.findByIdWithMember(boardId).orElseThrow(BoardNotFoundException::new);
     }
 
     @Transactional
@@ -79,6 +80,7 @@ public class BoardService {
     @Transactional
     public Board writeBoard(BoardRequestDto requestDto, MultipartFile thumbNailImage, String memberEmail) {
         var category = categoryRepository.findByIdWithMemberAndBoard(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
+        int postNum =category.getMember().getBoardList().size()+1;
         if (!hasPermissionOfCategory(category, memberEmail)) {
             throw new CategoryAccessPermissionDeniedException();
         }
@@ -94,6 +96,7 @@ public class BoardService {
                 .content(requestDto.getContent())
                 .thumbnailUrl(thumbnailUrl)
                 .category(category)
+                .postNumber(postNum)
                 .build();
 
         return boardRepository.save(board);
