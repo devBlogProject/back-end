@@ -52,6 +52,7 @@ public class BoardController {
         return ApiResponse.createSuccess(BoardResponseDto.of(updatedBoard));
     }
 
+    // /board/nickname/{nickname}/post-num/{post_num}
     @GetMapping("/nickname/{nickname}/post-num/{post_num}")
     public ApiResponse<BoardResponseDto> getBoard(@PathVariable("nickname") String nickname, @PathVariable("post_num") int postNum){
         Board board = boardService.getBoard(nickname,postNum);
