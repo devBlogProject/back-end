@@ -64,6 +64,7 @@ class BoardRepositoryTest {
                     .thumbnailUrl("thumbnail")
                     .postNumber(i+1)
                     .build();
+            board.changeAuthor(testMember);
             boardList.add(boardRepository.save(board));
         }
 
@@ -72,6 +73,7 @@ class BoardRepositoryTest {
 
         assertEquals(8,boardRepository.findAll().size());
         assertFalse(boardRepository.findByIdWithMember(boardList.get(0).getId()).isPresent());
+        assertEquals(10,testMember.getBoardList().size());
     }
 
     @Test
