@@ -4,16 +4,18 @@ import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.comment.domain.Comment;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "UPDATE board SET is_deleted = true WHERE board_id = ?")
+@Where(clause = "is_deleted = false")
 @Getter @Setter
 public class Board extends BaseEntity {
 
@@ -44,6 +46,8 @@ public class Board extends BaseEntity {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> parentCommentList = new ArrayList<>();
+
+    private boolean isDeleted=false;
 
     @Builder
     public Board(String title, String content, String thumbnailUrl,int postNumber ) {

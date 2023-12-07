@@ -55,6 +55,26 @@ class BoardRepositoryTest {
     }
 
     @Test
+    void soft_delete(){
+        List<Board> boardList = new ArrayList<>();
+        for(int i =0; i<10;i++){
+            Board board = Board.builder()
+                    .title("title")
+                    .content("content")
+                    .thumbnailUrl("thumbnail")
+                    .postNumber(i+1)
+                    .build();
+            boardList.add(boardRepository.save(board));
+        }
+
+        boardRepository.delete(boardList.get(0));
+        boardRepository.delete(boardList.get(1));
+
+        assertEquals(8,boardRepository.findAll().size());
+        assertFalse(boardRepository.findByIdWithMember(boardList.get(0).getId()).isPresent());
+    }
+
+    @Test
     void findByNicknameAndPostNumberWithMember(){
         Board board = Board.builder()
                 .title("title")
