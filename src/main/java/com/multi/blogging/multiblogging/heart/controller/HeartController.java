@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/heart")
@@ -27,7 +29,7 @@ public class HeartController {
     }
 
     @GetMapping("/board/{board_id}")
-    public ApiResponse<Integer> getHearts(@PathVariable("board_id") Long boardId){
+    public ApiResponse<Set<Object>> getHearts(@PathVariable("board_id") Long boardId){
         return ApiResponse.createSuccess(heartService.getHearts(boardId));
     }
 }

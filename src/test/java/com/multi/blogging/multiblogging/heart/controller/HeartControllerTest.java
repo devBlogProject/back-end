@@ -58,15 +58,15 @@ class HeartControllerTest {
     Member member;
     Board board;
 
-    private void setAuthNewUser() {
+    private void setAuthNewUser(String email,String nickname) {
         MemberSignUpRequestDto memberSignUpRequestDto = new MemberSignUpRequestDto();
-        memberSignUpRequestDto.setEmail("abc@abc.com");
+        memberSignUpRequestDto.setEmail(email);
         memberSignUpRequestDto.setPassword("1234");
-        memberSignUpRequestDto.setNickName("anotherUser");
+        memberSignUpRequestDto.setNickName(nickname);
         memberService.signUp(memberSignUpRequestDto);
 
         SecurityContext context = SecurityContextHolder.getContext();
-        UserDetails user = userDetailsService.loadUserByUsername("abc@abc.com");
+        UserDetails user = userDetailsService.loadUserByUsername(email);
         context.setAuthentication(new UsernamePasswordAuthenticationToken(user, "sampleToken", user.getAuthorities()));
     }
 
@@ -86,26 +86,33 @@ class HeartControllerTest {
     @Test
     void getHearts()throws Exception{
         for (int i=0;i<10;i++){
-            heartRepository.save(Heart.builder().board(board).member(member).build());
+            setAuthNewUser("abc@abc.com"+i,"nickname"+i);
+            SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com"+i);
+            mockMvc.perform(post("/heart/board/{board_id}",board.getId())
+                            .with(user)
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isCreated());
         }
 
         mockMvc.perform(get("/heart/board/{board_id}", board.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value(10))
+                .andExpect(jsonPath("$.data.length()").value(10))
                 .andDo(print());
     }
 
     @Test
     @WithMockUser(username = TEST_EMAIL)
-    void 좋아요_유저별로체크() throws Exception {
+    void 좋아요_삭제() throws Exception {
         mockMvc.perform(post("/heart/board/{board_id}", board.getId()))
                 .andExpect(status().isCreated())
                 .andDo(print());
 
-        setAuthNewUser();
-        SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("abc@abc.com");
+        mockMvc.perform(delete("/heart/board/{board_id}", board.getId()))
+                .andExpect(status().isOk());
 
-        mockMvc.perform(delete("/heart/board/{board_id}", board.getId()).with(user))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/heart/board/{board_id}", board.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(0))
+                .andDo(print());
     }
 }

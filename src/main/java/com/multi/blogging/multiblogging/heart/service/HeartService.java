@@ -10,37 +10,30 @@ import com.multi.blogging.multiblogging.heart.domain.Heart;
 import com.multi.blogging.multiblogging.heart.exception.HeartConflictException;
 import com.multi.blogging.multiblogging.heart.exception.HeartNotFoundException;
 import com.multi.blogging.multiblogging.heart.repository.HeartRepository;
+import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class HeartService {
-    private final HeartRepository heartRepository;
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
+    private final RedisService redisService;
 
-    @Transactional
+    private final String HEART_PREFIX = "HEART ";
+
     public void insert(String memberEmail, Long boardId) {
-        Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
-        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
-        if (heartRepository.findByMemberAndBoard(member.getId(), boardId).isPresent()) {
-            throw new HeartConflictException();
-        }
-
-        heartRepository.save(Heart.builder().member(member).board(board).build());
+        redisService.setSetOps(HEART_PREFIX+boardId,memberEmail);
     }
 
-    @Transactional
     public void delete(String memberEmail, Long boardId) {
-        Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
-        Heart heart = heartRepository.findByMemberAndBoard(member.getId(), boardId).orElseThrow(HeartNotFoundException::new);
-        heartRepository.delete(heart);
+        redisService.deleteSetOps(HEART_PREFIX+boardId,memberEmail);
     }
-
-    @Transactional(readOnly = true)
-    public int getHearts(Long boardId){
-        return heartRepository.getCountByBoard(boardId);
+    public Set<Object> getHearts(Long boardId){
+        return redisService.getSetOps(HEART_PREFIX + boardId);
     }
 }
