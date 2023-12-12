@@ -24,7 +24,7 @@ public class HeartService {
     private final BoardRepository boardRepository;
     private final RedisService redisService;
 
-    private final String HEART_PREFIX = "HEART ";
+    private final String HEART_PREFIX = "Heart ";
 
     public void insert(String memberEmail, Long boardId) {
         redisService.setSetOps(HEART_PREFIX+boardId,memberEmail);
