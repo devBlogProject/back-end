@@ -14,17 +14,20 @@ import com.multi.blogging.multiblogging.category.exception.CategoryAccessPermiss
 import com.multi.blogging.multiblogging.category.exception.CategoryNotFoundException;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
+import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,15 +35,40 @@ public class BoardService {
 
     private final CategoryRepository categoryRepository;
     private final BoardRepository boardRepository;
-    private final MemberRepository memberRepository;
     private final ImageUploadService imageUploadService;
+    private final RedisService redisService;
+
+    public final String VIEW_COUNT_PREFIX = "Viewcount ";
     public static final String DEFAULT_THUMB_URL = "https://cdn.pixabay.com/photo/2020/11/08/13/28/tree-5723734_1280.jpg";
 
 
     @Transactional(readOnly = true)
-    public Board getBoard(String nickname,int postNum) {
-        return boardRepository.findByMemberNicknameAndPostNumberWithMember(nickname, postNum).orElseThrow(BoardNotFoundException::new);
-//        return boardRepository.findByIdWithMember(boardId).orElseThrow(BoardNotFoundException::new);
+    public Board getBoard(HttpServletRequest request, String nickname, int postNum) {
+        Board board = boardRepository.findByMemberNicknameAndPostNumberWithMember(nickname, postNum).orElseThrow(BoardNotFoundException::new);
+        addViewCount(request, board);
+        return board;
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 30) //30분
+    @Transactional
+    public void transferAndClearViewCount() {
+        Map<String, Set> boardIdAndAddressMap = redisService.getKeyAndSetOpsContainPrefix(VIEW_COUNT_PREFIX);
+        for (String key : boardIdAndAddressMap.keySet()) {
+            Set IPAddresses = boardIdAndAddressMap.get(key);
+            Long boardId = Long.valueOf(key.replace(VIEW_COUNT_PREFIX, ""));
+            Optional<Board> board=boardRepository.findById(boardId);
+            if (board.isPresent()){
+                int oldViewCount = board.get().getViewCount();
+                int newViewCount = oldViewCount + IPAddresses.size();
+                board.get().setViewCount(newViewCount);
+            }
+        }
+        redisService.deleteKeyByContainPrefix(VIEW_COUNT_PREFIX);
+    }
+
+    private void addViewCount(HttpServletRequest request, Board board) {
+        String ipAddress = request.getRemoteAddr();
+        redisService.setSetOps(VIEW_COUNT_PREFIX + board.getId(), ipAddress);
     }
 
     @Transactional
@@ -80,7 +108,7 @@ public class BoardService {
     @Transactional
     public Board writeBoard(BoardRequestDto requestDto, MultipartFile thumbNailImage, String memberEmail) {
         var category = categoryRepository.findByIdWithMemberAndBoard(requestDto.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
-        int postNum =category.getMember().getBoardList().size()+1;
+        int postNum = category.getMember().getBoardList().size() + 1;
         if (!hasPermissionOfCategory(category, memberEmail)) {
             throw new CategoryAccessPermissionDeniedException();
         }

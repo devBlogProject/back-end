@@ -36,6 +36,8 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private int postNumber;
 
+    private int viewCount=0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member author;

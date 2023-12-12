@@ -8,6 +8,7 @@ import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.repository.CategoryRepository;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
+import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +58,9 @@ class BoardServiceTest {
     @MockBean
     MemberRepository memberRepository;
 
+    @MockBean
+    RedisService redisService;
+
 
     @MockBean
     CategoryRepository categoryRepository;
@@ -65,6 +69,7 @@ class BoardServiceTest {
     BoardRepository boardRepository;
 
     private MockMultipartFile imageFile = new MockMultipartFile("image", "image.jpg", "image/jpg", "<<jpg data>>".getBytes());
+
 
     @Test
     void 썸네일_없이_콘텐츠에_이미지도_없이_업로드() {

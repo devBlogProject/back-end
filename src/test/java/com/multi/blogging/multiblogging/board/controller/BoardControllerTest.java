@@ -12,6 +12,7 @@ import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
 import com.multi.blogging.multiblogging.category.service.CategoryService;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
+import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,12 +46,14 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.multi.blogging.multiblogging.Constant.*;
 import static com.multi.blogging.multiblogging.board.service.BoardService.DEFAULT_THUMB_URL;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -82,6 +85,8 @@ class BoardControllerTest {
     UserDetailsService userDetailsService;
     @Autowired
     BoardRepository boardRepository;
+    @Autowired
+    RedisService redisService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -120,6 +125,54 @@ class BoardControllerTest {
 
         String response = result.getResponse().getContentAsString();
         categoryId = ((Number) JsonPath.read(response, "$.data.id")).longValue();
+    }
+
+    @Test
+    void 조회수() throws Exception{
+        BoardRequestDto boardRequestDto = new BoardRequestDto();
+        boardRequestDto.setTitle("title");
+        boardRequestDto.setContent(String.valueOf(html(body(h1("hello world")))));
+        boardRequestDto.setCategoryId(categoryId);
+        var result = mockMvc.perform(multipart("/board")
+                        .file(new MockMultipartFile("boardRequestDto",
+                                "dto",
+                                "application/json",
+                                objectMapper.writeValueAsString(boardRequestDto).getBytes(StandardCharsets.UTF_8)))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        long boardId = ((Number) JsonPath.read(response, "$.data.id")).longValue();
+        int postNum= JsonPath.read(response, "$.data.postNum");
+
+        for (int i=0;i<5;i++) {  // 3번 반복
+            for (int j = 0; j < 10; j++) {  //10개의 IP에서 접속 -> 따라서 조회수는 10개만 나와야 한다.
+                int finalJ = j;
+                mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}", TEST_NICK, postNum)
+                                .with(request -> {
+                                    request.setRemoteAddr("192.168.0." + finalJ);
+                                    return request;
+                                }))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.data.title").value("title"))
+                        .andExpect(jsonPath("$.data.content").value(String.valueOf(html(body(h1("hello world"))))))
+                        .andDo(print());
+            }
+        }
+
+        assertEquals(10,redisService.getKeyAndSetOpsContainPrefix(boardService.VIEW_COUNT_PREFIX).get(boardService.VIEW_COUNT_PREFIX+boardId).size());
+        mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}", TEST_NICK, postNum))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.viewCount").value(0));
+        boardService.transferAndClearViewCount();
+
+        assertEquals(0,redisService.getKeyAndSetOpsContainPrefix(boardService.VIEW_COUNT_PREFIX).size());
+        mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}", TEST_NICK, postNum))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.viewCount").value(10+1));
+
     }
 
     @Test

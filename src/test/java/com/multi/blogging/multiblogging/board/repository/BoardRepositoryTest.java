@@ -54,6 +54,7 @@ class BoardRepositoryTest {
         categoryRepository.save(testCategory);
     }
 
+
     @Test
     void soft_delete(){
         List<Board> boardList = new ArrayList<>();

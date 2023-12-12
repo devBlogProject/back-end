@@ -1,16 +1,13 @@
 package com.multi.blogging.multiblogging.infra.redisDb;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -57,6 +54,11 @@ public class RedisService {
         return Boolean.TRUE.equals(values.hasKey(key, hashKey)) ? (String) redisTemplate.opsForHash().get(key, hashKey) : "";
     }
 
+    @Transactional(readOnly = true)
+    public Map<Object, Object> getHashData(String key){
+        return redisTemplate.opsForHash().entries(key);
+    }
+
     public void deleteHashOps(String key, String hashKey) {
         HashOperations<String, Object, Object> values = redisTemplate.opsForHash();
         values.delete(key, hashKey);
@@ -67,10 +69,36 @@ public class RedisService {
         setOperations.add(key, setValue);
     }
 
+    @Transactional(readOnly = true)
     public Set<Object> getSetOps(String key){
         SetOperations<String, Object> setOperations = redisTemplate.opsForSet();
         return setOperations.members(key);
     }
+
+    @Transactional(readOnly = true)
+    public Map<String,Set> getKeyAndSetOpsContainPrefix(String prefix){
+        Map<String, Set> keyAndSetMap = new HashMap<>();
+        ScanOptions options = ScanOptions.scanOptions().match(prefix+"*").build();
+        Cursor<byte[]> scan = Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().scan(options);
+        while (scan.hasNext()) {
+            byte[] next = scan.next();
+            String key = new String(next, StandardCharsets.UTF_8);
+            keyAndSetMap.put(key, getSetOps(key));
+        }
+
+        return keyAndSetMap;
+    }
+
+    public void deleteKeyByContainPrefix(String prefix){
+        ScanOptions options = ScanOptions.scanOptions().match(prefix+"*").build();
+        Cursor<byte[]> scan = Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().scan(options);
+        while (scan.hasNext()){
+            byte[] next = scan.next();
+            String key = new String(next, StandardCharsets.UTF_8);
+            redisTemplate.delete(key);
+        }
+    }
+
     public void deleteSetOps(String key,String value){
         SetOperations<String, Object> setOperations = redisTemplate.opsForSet();
         setOperations.remove(key, value);

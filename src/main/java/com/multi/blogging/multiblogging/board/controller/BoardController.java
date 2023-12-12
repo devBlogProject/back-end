@@ -7,6 +7,7 @@ import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
 import com.multi.blogging.multiblogging.board.dto.response.BoardResponseDto;
 import com.multi.blogging.multiblogging.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -54,8 +55,8 @@ public class BoardController {
 
     // /board/nickname/{nickname}/post-num/{post_num}
     @GetMapping("/nickname/{nickname}/post-num/{post_num}")
-    public ApiResponse<BoardResponseDto> getBoard(@PathVariable("nickname") String nickname, @PathVariable("post_num") int postNum){
-        Board board = boardService.getBoard(nickname,postNum);
+    public ApiResponse<BoardResponseDto> getBoard(HttpServletRequest request, @PathVariable("nickname") String nickname, @PathVariable("post_num") int postNum){
+        Board board = boardService.getBoard(request,nickname,postNum);
         return ApiResponse.createSuccess(BoardResponseDto.of(board));
     }
 
