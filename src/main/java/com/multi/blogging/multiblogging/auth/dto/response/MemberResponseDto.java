@@ -2,6 +2,7 @@ package com.multi.blogging.multiblogging.auth.dto.response;
 
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.auth.enums.Authority;
+import com.multi.blogging.multiblogging.auth.enums.SocialType;
 import com.multi.blogging.multiblogging.base.BaseResponseDto;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,8 @@ public class MemberResponseDto extends BaseResponseDto {
 
     private String imageUrl;
 
+    private SocialType socialType;
+
     public static MemberResponseDto of(Member member){
         return MemberResponseDto.builder()
                 .email(member.getEmail())
@@ -34,6 +37,7 @@ public class MemberResponseDto extends BaseResponseDto {
                 .imageUrl(member.getImageUrl())
                 .createdDate(member.getCreatedDate())
                 .updatedDate(member.getUpdatedDate())
+                .socialType(member.getSocialType())
                 .build();
     }
 }
