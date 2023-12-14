@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.GET,"/member/**").permitAll()
                         .requestMatchers("/member/signup").permitAll()
                         .requestMatchers("/member/email/**").permitAll()
                         .requestMatchers("/member/nickname/**").permitAll()

@@ -44,9 +44,9 @@ public class MemberController {
         return ApiResponse.createSuccessWithNoContent();
     }
 
-    @GetMapping("/profile")
-    public ApiResponse<MemberResponseDto> getMemberProfile() {
-        MemberResponseDto dto = MemberResponseDto.of(memberService.getMemberProfile());
+    @GetMapping("/profile/{nickname}")
+    public ApiResponse<MemberResponseDto> getMemberProfile(@PathVariable("nickname")String nickname) {
+        MemberResponseDto dto = MemberResponseDto.of(memberService.getMemberProfile(nickname));
         return ApiResponse.createSuccess(dto);
     }
 

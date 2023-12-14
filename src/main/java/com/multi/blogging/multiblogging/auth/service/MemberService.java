@@ -66,10 +66,9 @@ public class MemberService {
         member.get().updatePassword(passwordEncoder,newPassword);
     }
 
-    @Transactional
-    public Member getMemberProfile() {
-        String email = SecurityUtil.getCurrentMemberEmail();
-        Optional<Member> member = memberRepository.findOneByEmail(email);
+    @Transactional(readOnly = true)
+    public Member getMemberProfile(String nickname) {
+        Optional<Member> member = memberRepository.findByNickName(nickname);
         if (member.isEmpty()) {
             throw new MemberNotFoundException();
         }
