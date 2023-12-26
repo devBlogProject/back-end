@@ -7,6 +7,7 @@ import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.comment.domain.Comment;
 import com.multi.blogging.multiblogging.comment.domain.ReComment;
+import com.multi.blogging.multiblogging.tempboard.domain.TempBoard;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +43,9 @@ public class Member extends BaseEntity {
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
     @Enumerated(EnumType.STRING)
     private SocialType socialType; // KAKAO, NAVER, GOOGLE
+
+    @OneToOne(mappedBy = "author",fetch = FetchType.LAZY)
+    private TempBoard tempBoard;
 
     @OneToMany(mappedBy = "author")
     private List<Board> boardList = new ArrayList<>();
