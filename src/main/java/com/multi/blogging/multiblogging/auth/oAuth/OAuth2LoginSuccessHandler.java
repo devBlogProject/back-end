@@ -16,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -27,7 +29,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private ObjectMapper objectMapper = new ObjectMapper();
+
+    static final String REDIRECT_URL = "http://localhost:5173/authgoogle";
+    static final String ACCESS_TOKEN_PARAMETER = "accessToken";
+    static final String REFRESH_TOKEN_PARAMETER = "refreshToken";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -38,13 +43,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 //                User findUser = userRepository.findByEmail(oAuth2User.getEmail())
 //                                .orElseThrow(() -> new IllegalArgumentException("이메일에 해당하는 유저가 없습니다."));
 //                findUser.authorizeUser();
-            loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
+        loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
 
     }
 
     private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(oAuth2User.getEmail(),"",oAuth2User.getAuthorities());
+                new UsernamePasswordAuthenticationToken(oAuth2User.getEmail(), "", oAuth2User.getAuthorities());
 
         String accessToken = tokenProvider.createAccessToken(authenticationToken);
         String refreshTokenString = tokenProvider.createRefreshToken(authenticationToken);
@@ -56,8 +61,15 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             refreshTokenRepository.save(newToken);
         }
 
-        String result = objectMapper.writeValueAsString(new TokenDto(accessToken, refreshTokenString));
-        response.setContentType("application/json");
-        response.getWriter().write(result);
+//        String result = objectMapper.writeValueAsString(new TokenDto(accessToken, refreshTokenString));
+//        response.setContentType("application/json");
+//        response.getWriter().write(result);
+        String redirectUrl = UriComponentsBuilder
+                .fromUriString(REDIRECT_URL)
+                .queryParam(ACCESS_TOKEN_PARAMETER, accessToken)
+                .queryParam(REFRESH_TOKEN_PARAMETER, refreshToken)
+                .toUriString();
+
+        response.sendRedirect(redirectUrl);
     }
 }
