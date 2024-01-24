@@ -1,4 +1,4 @@
-package com.multi.blogging.multiblogging.web.config;
+package com.multi.blogging.multiblogging.base.config;
 
 import com.multi.blogging.multiblogging.board.interceptor.BoardAuthInterceptor;
 import com.multi.blogging.multiblogging.category.interceptor.CategoryAuthInterceptor;
