@@ -12,7 +12,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -58,6 +60,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<ReComment> reCommentList = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    private Set<String> userTags = new HashSet<>();
 
     @Builder
     public Member(String email, String password, String nickName, Authority authority,SocialType socialType,String socialId,String imageUrl) {
