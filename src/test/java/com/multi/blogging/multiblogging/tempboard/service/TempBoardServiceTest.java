@@ -41,6 +41,16 @@ class TempBoardServiceTest {
     @Test
     void saveTempBoard(){
         Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
+        given(memberRepository.findOneByEmail(anyString())).willReturn(Optional.of(testMember));
+        given(tempBoardRepository.findByAuthorEmail(anyString())).willReturn(Optional.empty());
+
+        tempBoardService.saveTempBoard(TEST_EMAIL, "title", "content");
+        verify(tempBoardRepository,times(1)).save(any());
+    }
+
+    @Test
+    void saveTempBoardWhenDuplicate(){
+        Member testMember = Member.builder().email(TEST_EMAIL).nickName(TEST_NICK).build();
         TempBoard exTempBoard = new TempBoard();
         exTempBoard.setTitle("title");
         exTempBoard.setContent("content");
@@ -49,11 +59,12 @@ class TempBoardServiceTest {
         given(memberRepository.findOneByEmail(anyString())).willReturn(Optional.of(testMember));
         given(tempBoardRepository.findByAuthorEmail(anyString())).willReturn(Optional.of(exTempBoard));
 
-        tempBoardService.saveTempBoard(TEST_EMAIL, "title", "content");
+        tempBoardService.saveTempBoard(TEST_EMAIL, "title1", "content1");
 
-        verify(tempBoardRepository,times(1)).delete(exTempBoard);
-        verify(tempBoardRepository, times(1)).save(any());
+        verify(tempBoardRepository,never()).save(any());
         verify(tempBoardRepository, never()).save(exTempBoard);
+        assertEquals("title1",exTempBoard.getTitle());
+        assertEquals("content1",exTempBoard.getContent());
     }
 
     @Test

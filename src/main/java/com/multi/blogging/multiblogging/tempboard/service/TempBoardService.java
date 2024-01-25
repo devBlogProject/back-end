@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class TempBoardService {
@@ -24,14 +26,17 @@ public class TempBoardService {
     public TempBoard saveTempBoard(String authorEmail, String title, String content) {
         var author = memberRepository.findOneByEmail(authorEmail).orElseThrow(MemberNotFoundException::new);
         var exTempBoard = tempBoardRepository.findByAuthorEmail(authorEmail);
-        exTempBoard.ifPresent(tempBoardRepository::delete);
-
-        TempBoard newTempBoard = new TempBoard();
-        newTempBoard.setTitle(title);
-        newTempBoard.setContent(content);
-        newTempBoard.changeAuthor(author);
-
-        return tempBoardRepository.save(newTempBoard);
+        if(exTempBoard.isPresent()){
+            exTempBoard.get().setTitle(title);
+            exTempBoard.get().setContent(content);
+            return exTempBoard.get();
+        }else{
+            TempBoard tempBoard = new TempBoard();
+            tempBoard.setTitle(title);
+            tempBoard.setContent(content);
+            tempBoard.changeAuthor(author);
+            return tempBoardRepository.save(tempBoard);
+        }
     }
 
     @Transactional
