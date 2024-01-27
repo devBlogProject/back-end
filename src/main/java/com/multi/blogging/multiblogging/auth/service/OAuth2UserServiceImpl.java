@@ -56,7 +56,8 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
 
-        Member createdMember = getMember(extractAttributes, socialType); // getUser() 메소드로 User 객체 생성 후 반환
+        checkDuplicateMember(extractAttributes);
+        Member createdMember = getMember(extractAttributes, socialType); // getMember() 메소드로 User 객체 생성 후 반환
 
         // DefaultOAuth2User를 구현한 CustomOAuth2User 객체를 생성해서 반환
         return new CustomOAuth2User(
@@ -78,18 +79,24 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         return SocialType.GOOGLE;
     }
 
+    private void checkDuplicateMember(OAuthAttributes attributes){
+        String email = attributes.getOauth2UserInfo().getEmail();
+        Member nonSocialMember = memberRepository.findOneByEmail(email).orElse(null);
+        if (nonSocialMember!=null) throw new OAuth2AuthenticationException("이미 일반 회원가입 계정입니다.");
+    }
+
     /**
      * SocialType과 attributes에 들어있는 소셜 로그인의 식별값 id를 통해 회원을 찾아 반환하는 메소드
      * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
      */
     private Member getMember(OAuthAttributes attributes, SocialType socialType) {
-        Member findMember = memberRepository.findBySocialTypeAndSocialId(socialType,
+        Member exSocialMember = memberRepository.findBySocialTypeAndSocialId(socialType,
                 attributes.getOauth2UserInfo().getId()).orElse(null);
 
-        if (findMember == null) {
+        if (exSocialMember == null) {
             return saveMember(attributes, socialType);
         }
-        return findMember;
+        return exSocialMember;
     }
 
     /**

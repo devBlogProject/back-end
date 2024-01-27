@@ -69,6 +69,22 @@ class AuthControllerTest {
         );
     }
 
+//    @Test
+//    @Transactional
+//    void oauth충돌테스트() throws Exception{
+//        MemberSignUpRequestDto signUpRequestDto = new MemberSignUpRequestDto();
+//        signUpRequestDto.setEmail(TEST_EMAIL);
+//        signUpRequestDto.setPassword(TEST_PASSWORD);
+//        signUpRequestDto.setNickName(TEST_NICK);
+//
+//        mockMvc.perform(post("/member/signup")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(signUpRequestDto))
+//        ).andExpect(status().isCreated());
+//
+//
+//    }
+
     @Test
     @Transactional
     void 토큰발급_로그인() throws Exception {
