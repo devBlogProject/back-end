@@ -1,10 +1,12 @@
 package com.multi.blogging.multiblogging.auth.controller;
 
 import com.jayway.jsonpath.JsonPath;
+import com.multi.blogging.multiblogging.auth.dto.TokenDto;
 import com.multi.blogging.multiblogging.auth.dto.request.MemberLoginRequestDto;
 import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
 import com.multi.blogging.multiblogging.auth.dto.request.TokenReIssueRequestDto;
 import com.multi.blogging.multiblogging.auth.jwt.TokenProvider;
+import com.multi.blogging.multiblogging.auth.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +14,21 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import static com.multi.blogging.multiblogging.Constant.TEST_EMAIL;
-import static com.multi.blogging.multiblogging.Constant.TEST_NICK;
+import static com.multi.blogging.multiblogging.Constant.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -42,6 +48,9 @@ class AuthControllerTest {
 
     @Autowired
     TokenProvider tokenProvider;
+
+    @Autowired
+    AuthService authService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -122,6 +131,31 @@ class AuthControllerTest {
         connectSample(newAccessToken);
     }
 
+    @Test
+    @Transactional
+    void login() throws Exception {
+        MemberLoginRequestDto memberLoginRequestDto= new MemberLoginRequestDto();
+        memberLoginRequestDto.setEmail(TEST_EMAIL);
+        memberLoginRequestDto.setPassword(TEST_PASSWORD);
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberLoginRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken").exists())
+                .andExpect(jsonPath("$.data.refreshToken").exists())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        String accessToken=JsonPath.read(response,"$.data.accessToken");
+
+
+        mockMvc.perform(get("/sample").header("Authorization",BEARER_PREFIX+accessToken)).andExpect(status().isOk());
+    }
+    @Test
+    @Transactional
+    void shouldNotAllowAccessToUnauthenticatedUsers() throws Exception {
+        mockMvc.perform(get("/sample")).andExpect(status().isUnauthorized());
+    }
     private void connectSample(String accessToken) throws Exception {
         mockMvc.perform(get("/sample")
                         .header(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + accessToken))

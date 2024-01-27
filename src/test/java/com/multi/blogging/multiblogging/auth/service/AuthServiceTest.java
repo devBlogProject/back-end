@@ -45,8 +45,6 @@ class AuthServiceTest {
     @Autowired
     UserDetailsService userDetailsService;
 
-    @Autowired
-    MockMvc mockMvc;
 
 
 
@@ -61,20 +59,9 @@ class AuthServiceTest {
         memberService.signUp(signUpRequestDto);
     }
 
-    @Test
-    @Transactional
-    void shouldNotAllowAccessToUnauthenticatedUsers() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/sample")).andExpect(status().isUnauthorized());
-    }
 
-    @Test
-    @Transactional
-    void login() throws Exception {
-        TokenDto tokenDto = authService.login(TEST_EMAIL,TEST_PASSWORD);
-        setAuthentication();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/sample").header("Authorization",tokenDto.getAccessToken())).andExpect(status().isOk());
-    }
+
 
     @Test
     @Transactional
