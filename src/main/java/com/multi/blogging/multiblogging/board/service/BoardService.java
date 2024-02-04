@@ -1,12 +1,8 @@
 package com.multi.blogging.multiblogging.board.service;
 
-import com.multi.blogging.multiblogging.auth.exception.MemberNotFoundException;
-import com.multi.blogging.multiblogging.auth.repository.MemberRepository;
-import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
 import com.multi.blogging.multiblogging.board.exception.BoardNotFoundException;
-import com.multi.blogging.multiblogging.board.exception.BoardPermissionDeniedException;
 import com.multi.blogging.multiblogging.board.exception.BoardTitleConflictException;
 import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.category.domain.Category;
@@ -101,8 +97,13 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<Board> getBoards(Pageable pageable) {
+    public Slice<Board> getBoardSlice(Pageable pageable) {
         return boardRepository.findSliceWithMember(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Board> getNicknameBoardSlice(Pageable pageable, String nickname){
+        return boardRepository.findSliceByNicknameWithMember(pageable,nickname);
     }
 
     @Transactional

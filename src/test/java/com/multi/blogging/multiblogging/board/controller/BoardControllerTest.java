@@ -293,7 +293,7 @@ class BoardControllerTest {
             LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
             requestParams.add("page", Integer.toString(i));
             requestParams.add("size", Integer.toString(5));
-            var result = mockMvc.perform(get("/board/all").params(requestParams))
+            var result = mockMvc.perform(get("/board/page").params(requestParams))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data.content", hasSize(5)))
                     .andDo(print()).andReturn();

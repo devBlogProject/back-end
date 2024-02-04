@@ -46,9 +46,10 @@ class BoardRepositoryTest {
 
     Member testMember;
     Category testCategory;
+
     @BeforeEach
-    void setUp(){
-         testMember = Member.builder().email(TEST_EMAIL).password(TEST_PASSWORD).nickName(TEST_NICK).build();
+    void setUp() {
+        testMember = Member.builder().email(TEST_EMAIL).password(TEST_PASSWORD).nickName(TEST_NICK).build();
         memberRepository.save(testMember);
         testCategory = new Category("title", testMember);
         categoryRepository.save(testCategory);
@@ -56,14 +57,14 @@ class BoardRepositoryTest {
 
 
     @Test
-    void soft_delete(){
+    void soft_delete() {
         List<Board> boardList = new ArrayList<>();
-        for(int i =0; i<10;i++){
+        for (int i = 0; i < 10; i++) {
             Board board = Board.builder()
                     .title("title")
                     .content("content")
                     .thumbnailUrl("thumbnail")
-                    .postNumber(i+1)
+                    .postNumber(i + 1)
                     .build();
             board.changeAuthor(testMember);
             boardList.add(boardRepository.save(board));
@@ -72,13 +73,13 @@ class BoardRepositoryTest {
         boardRepository.delete(boardList.get(0));
         boardRepository.delete(boardList.get(1));
 
-        assertEquals(8,boardRepository.findAll().size());
+        assertEquals(8, boardRepository.findAll().size());
         assertFalse(boardRepository.findByIdWithMember(boardList.get(0).getId()).isPresent());
-        assertEquals(10,testMember.getBoardList().size());
+        assertEquals(10, testMember.getBoardList().size());
     }
 
     @Test
-    void findByNicknameAndPostNumberWithMember(){
+    void findByNicknameAndPostNumberWithMember() {
         Board board = Board.builder()
                 .title("title")
                 .content("content")
@@ -93,7 +94,7 @@ class BoardRepositoryTest {
     }
 
     @Test
-    void findByIdWithMemberAndComment(){
+    void findByIdWithMemberAndComment() {
         Board board = Board.builder()
                 .title("title")
                 .content("content")
@@ -102,7 +103,7 @@ class BoardRepositoryTest {
                 .build();
 
         List<Comment> comments = new ArrayList<>();
-        for (int i=0; i<5;i++){
+        for (int i = 0; i < 5; i++) {
             Comment comment = Comment.builder().board(board).member(testMember).content("comment").build();
             comments.add(comment);
             commentRepository.save(comment);
@@ -112,10 +113,11 @@ class BoardRepositoryTest {
 
         assertTrue(boardRepository.findByIdWithMember(board.getId()).isPresent());
     }
+
     @Test
     void findSliceBy() throws InterruptedException {
 
-        for(int i =0; i<10;i++){
+        for (int i = 0; i < 10; i++) {
             Board board = Board.builder()
                     .title("title")
                     .content("content")
@@ -125,41 +127,74 @@ class BoardRepositoryTest {
             boardRepository.save(board);
             Thread.sleep(100);
         }
-        PageRequest pageRequest = PageRequest.of(0, 5,Sort.by(Sort.Direction.DESC,"createdDate"));
-        Slice<Board> boards=boardRepository.findSliceBy(pageRequest);
+        PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<Board> boards = boardRepository.findSliceBy(pageRequest);
 
-        assertEquals(5,boards.getSize());
+        assertEquals(5, boards.getSize());
         assertTrue(boards.getSort().isSorted());
 
         LocalDateTime maxDate = LocalDateTime.MAX;
         List<Board> boardList = boards.stream().toList();
-        for (int i=1;i<boardList.size();i++){
-            assertTrue(boardList.get(i-1).getCreatedDate().isAfter(boardList.get(i).getCreatedDate()));
+        for (int i = 1; i < boardList.size(); i++) {
+            assertTrue(boardList.get(i - 1).getCreatedDate().isAfter(boardList.get(i).getCreatedDate()));
         }
 
     }
 
     @Test
     void findSliceWithMember() throws InterruptedException {
-        for(int i =0; i<10;i++){
+        for (int i = 0; i < 10; i++) {
             Board board = Board.builder()
                     .title("title")
                     .content("content")
                     .thumbnailUrl("thumbnail")
-                    .postNumber(i+1)
+                    .postNumber(i + 1)
                     .build();
             boardRepository.save(board);
             Thread.sleep(100);
         }
-        PageRequest pageRequest = PageRequest.of(0, 5,Sort.by(Sort.Direction.DESC,"createdDate"));
-        Slice<Board> boards=boardRepository.findSliceWithMember(pageRequest);
+        PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<Board> boards = boardRepository.findSliceWithMember(pageRequest);
 
-        assertEquals(5,boards.getSize());
+        assertEquals(5, boards.getSize());
         assertTrue(boards.getSort().isSorted());
 
         List<Board> boardList = boards.stream().toList();
-        for (int i=1;i<boardList.size();i++){
-            assertTrue(boardList.get(i-1).getCreatedDate().isAfter(boardList.get(i).getCreatedDate()));
+        for (int i = 1; i < boardList.size(); i++) {
+            assertTrue(boardList.get(i - 1).getCreatedDate().isAfter(boardList.get(i).getCreatedDate()));
         }
+    }
+
+    @Test
+    void findSliceByNicknameWithMember() throws InterruptedException {
+        for (int i = 0; i < 5; i++) {
+            Board board = Board.builder()
+                    .title("title")
+                    .content("content")
+                    .thumbnailUrl("thumbnail")
+                    .postNumber(i + 1)
+                    .build();
+            board.changeAuthor(testMember);
+            boardRepository.save(board);
+            Thread.sleep(100);
+        }
+
+        Member testMember2 = Member.builder().email("test2@test.com").password(TEST_PASSWORD).nickName("another_nick").build();
+        memberRepository.save(testMember2);
+        for (int i=0;i<5;i++){
+            Board board = Board.builder()
+                    .title("title")
+                    .content("content")
+                    .thumbnailUrl("thumbnail")
+                    .postNumber(i + 1)
+                    .build();
+            board.changeAuthor(testMember2);
+            boardRepository.save(board);
+            Thread.sleep(100);
+        }
+
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<Board> boards = boardRepository.findSliceByNicknameWithMember(pageRequest,TEST_NICK);
+        assertEquals(5, boards.getContent().size());
     }
 }

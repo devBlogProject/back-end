@@ -11,17 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 
 @RestController
@@ -39,10 +35,17 @@ public class BoardController {
         return ApiResponse.createSuccess(BoardResponseDto.of(writedBoard));
     }
 
-    @GetMapping("/all")
-    public ApiResponse<Slice<BoardResponseDto>> getBoards(@RequestParam int page, @RequestParam int size){
+    @GetMapping("/page")
+    public ApiResponse<Slice<BoardResponseDto>> getBoardSlice(@RequestParam int page, @RequestParam int size){
         PageRequest pageRequest = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdDate"));
-        Slice<Board> boards = boardService.getBoards(pageRequest);
+        Slice<Board> boards = boardService.getBoardSlice(pageRequest);
+        return ApiResponse.createSuccess(boards.map(BoardResponseDto::of));
+    }
+
+    @GetMapping("/page/nickname/{nickname}")
+    public ApiResponse<Slice<BoardResponseDto>> getNicknameBoardSlice(@RequestParam int page, @RequestParam int size, @PathVariable String nickname){
+        PageRequest pageRequest = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdDate"));
+        Slice<Board> boards = boardService.getNicknameBoardSlice(pageRequest,nickname);
         return ApiResponse.createSuccess(boards.map(BoardResponseDto::of));
     }
 

@@ -88,6 +88,25 @@ public class CustomBoardRepositoryImpl implements CustomBoardRepository {
         return new SliceImpl<>(boardList, pageable, hasNext);
     }
 
+    @Override
+    public Slice<Board> findSliceByNicknameWithMember(Pageable pageable, String nickname) {
+        List<Board> boardList = jpaQueryFactory.selectFrom(board)
+                .leftJoin(board.author, member).fetchJoin()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .where(board.author.nickName.eq(nickname))
+                .orderBy(getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .fetch();
+
+        boolean hasNext = false;
+        if (boardList.size() > pageable.getPageSize()) {
+            boardList.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(boardList, pageable, hasNext);
+    }
+
 
     private List<OrderSpecifier> getOrderSpecifier(Sort sort) {
         List<OrderSpecifier> orders = new ArrayList<>();
