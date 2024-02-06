@@ -3,12 +3,10 @@ package com.multi.blogging.multiblogging.board.controller;
 import com.jayway.jsonpath.JsonPath;
 import com.multi.blogging.multiblogging.auth.dto.request.MemberSignUpRequestDto;
 import com.multi.blogging.multiblogging.auth.service.MemberService;
-import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.dto.request.BoardImageUploadRequestDto;
 import com.multi.blogging.multiblogging.board.dto.request.BoardRequestDto;
 import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.board.service.BoardService;
-import com.multi.blogging.multiblogging.category.domain.Category;
 import com.multi.blogging.multiblogging.category.dto.request.CategoryRequestDto;
 import com.multi.blogging.multiblogging.category.service.CategoryService;
 import com.multi.blogging.multiblogging.imageUpload.service.ImageUploadService;
@@ -16,7 +14,6 @@ import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,7 +43,6 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.multi.blogging.multiblogging.Constant.*;
@@ -162,13 +158,11 @@ class BoardControllerTest {
             }
         }
 
-        assertEquals(10,redisService.getKeyAndSetOpsContainPrefix(boardService.VIEW_COUNT_PREFIX).get(boardService.VIEW_COUNT_PREFIX+boardId).size());
-        mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}", TEST_NICK, postNum))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.viewCount").value(0));
-        boardService.transferAndClearViewCount();
+//        mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}", TEST_NICK, postNum))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.data.viewCount").value(0));
+//        boardService.transferViewCountToDb();
 
-        assertEquals(0,redisService.getKeyAndSetOpsContainPrefix(boardService.VIEW_COUNT_PREFIX).size());
         mockMvc.perform(get("/board/nickname/{nickname}/post-num/{post_num}", TEST_NICK, postNum))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.viewCount").value(10+1));

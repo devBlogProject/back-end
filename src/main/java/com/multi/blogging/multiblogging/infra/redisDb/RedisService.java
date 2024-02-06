@@ -1,4 +1,7 @@
 package com.multi.blogging.multiblogging.infra.redisDb;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.*;
@@ -15,6 +18,17 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+
+
+    public <T> Optional<T> getObjectData(String key, Class<T> classType) throws Exception { // 객체가 매핑된 값을 읽어오는 함수
+        String jsonResult = (String) redisTemplate.opsForValue().get(key);
+        if (StringUtils.isBlank(jsonResult)) {
+            return Optional.empty();
+        } else {
+            return java.util.Optional.ofNullable(objectMapper.readValue(jsonResult, classType));
+        }
+    }
 
     public void setValues(String key, String data) {
         ValueOperations<String, Object> values = redisTemplate.opsForValue();
@@ -39,8 +53,12 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
-    public void expireValues(String key, int timeout) {
+    public void setExpireMilliSeconds(String key, int timeout) {
         redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
+    }
+
+    public void setExpireDays(String key,int timeout){
+        redisTemplate.expire(key, timeout, TimeUnit.DAYS);
     }
 
     public void setHashOps(String key, Map<String, String> data) {
@@ -55,7 +73,7 @@ public class RedisService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Object, Object> getHashData(String key){
+    public Map<Object, Object> getHashData(String key) {
         return redisTemplate.opsForHash().entries(key);
     }
 
@@ -70,15 +88,15 @@ public class RedisService {
     }
 
     @Transactional(readOnly = true)
-    public Set<Object> getSetOps(String key){
+    public Set<Object> getSetOps(String key) {
         SetOperations<String, Object> setOperations = redisTemplate.opsForSet();
         return setOperations.members(key);
     }
 
     @Transactional(readOnly = true)
-    public Map<String,Set> getKeyAndSetOpsContainPrefix(String prefix){
+    public Map<String, Set> getKeyAndSetOpsContainPrefix(String prefix) {
         Map<String, Set> keyAndSetMap = new HashMap<>();
-        ScanOptions options = ScanOptions.scanOptions().match(prefix+"*").build();
+        ScanOptions options = ScanOptions.scanOptions().match(prefix + "*").build();
         Cursor<byte[]> scan = Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().scan(options);
         while (scan.hasNext()) {
             byte[] next = scan.next();
@@ -89,17 +107,17 @@ public class RedisService {
         return keyAndSetMap;
     }
 
-    public void deleteKeyByContainPrefix(String prefix){
-        ScanOptions options = ScanOptions.scanOptions().match(prefix+"*").build();
+    public void deleteKeyByContainPrefix(String prefix) {
+        ScanOptions options = ScanOptions.scanOptions().match(prefix + "*").build();
         Cursor<byte[]> scan = Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().scan(options);
-        while (scan.hasNext()){
+        while (scan.hasNext()) {
             byte[] next = scan.next();
             String key = new String(next, StandardCharsets.UTF_8);
             redisTemplate.delete(key);
         }
     }
 
-    public void deleteSetOps(String key,String value){
+    public void deleteSetOps(String key, String value) {
         SetOperations<String, Object> setOperations = redisTemplate.opsForSet();
         setOperations.remove(key, value);
     }

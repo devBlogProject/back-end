@@ -53,6 +53,9 @@ class BoardServiceTest {
     @Autowired
     BoardService boardService;
     @MockBean
+    BoardRedisClient boardRedisClient;
+
+    @MockBean
     ImageUploadService imageUploadService;
 
     @MockBean

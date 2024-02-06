@@ -32,40 +32,41 @@ public class BoardService {
     private final CategoryRepository categoryRepository;
     private final BoardRepository boardRepository;
     private final ImageUploadService imageUploadService;
-    private final RedisService redisService;
+    private final BoardRedisClient boardRedisClient;
 
-    public final String VIEW_COUNT_PREFIX = "Viewcount ";
     public static final String DEFAULT_THUMB_URL = "https://cdn.pixabay.com/photo/2020/11/08/13/28/tree-5723734_1280.jpg";
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Board getBoard(HttpServletRequest request, String nickname, int postNum) {
         Board board = boardRepository.findByMemberNicknameAndPostNumberWithMember(nickname, postNum).orElseThrow(BoardNotFoundException::new);
-        addViewCount(request, board);
+        String ipAddress = request.getRemoteAddr();
+        if (!boardRedisClient.getClientIpAddressOfBoard(board).contains(ipAddress)) { // 현재 유저의 ip정보가 레디스에 없다면
+            boardRedisClient.addClientIpToCache(ipAddress, board);
+            int curViewCount = board.getViewCount();
+            board.setViewCount(curViewCount + 1);
+        }
+
         return board;
     }
 
-    @Scheduled(fixedDelay = 1000 * 60 * 30) //30분
-    @Transactional
-    public void transferAndClearViewCount() {
-        Map<String, Set> boardIdAndAddressMap = redisService.getKeyAndSetOpsContainPrefix(VIEW_COUNT_PREFIX);
-        for (String key : boardIdAndAddressMap.keySet()) {
-            Set IPAddresses = boardIdAndAddressMap.get(key);
-            Long boardId = Long.valueOf(key.replace(VIEW_COUNT_PREFIX, ""));
-            Optional<Board> board=boardRepository.findById(boardId);
-            if (board.isPresent()){
-                int oldViewCount = board.get().getViewCount();
-                int newViewCount = oldViewCount + IPAddresses.size();
-                board.get().setViewCount(newViewCount);
-            }
-        }
-        redisService.deleteKeyByContainPrefix(VIEW_COUNT_PREFIX);
-    }
+//    @Scheduled(fixedDelay = 1000 * 60*3) //3분마다 반영
+//    @Transactional
+//    public void transferViewCountToDb() {
+//        Map<String, Set> boardIdAndAddressMap = redisService.getKeyAndSetOpsContainPrefix(VIEW_COUNT_PREFIX);
+//        for (String key : boardIdAndAddressMap.keySet()) {
+//            Set IPAddresses = boardIdAndAddressMap.get(key);
+//            Long boardId = Long.valueOf(key.replace(VIEW_COUNT_PREFIX, ""));
+//            Optional<Board> board=boardRepository.findById(boardId);
+//            if (board.isPresent()){
+//                int oldViewCount = board.get().getViewCount();
+//                int newViewCount = oldViewCount + IPAddresses.size();
+//                board.get().setViewCount(newViewCount);
+//            }
+//        }
+//        redisService.deleteKeyByContainPrefix(VIEW_COUNT_PREFIX);
+//    }
 
-    private void addViewCount(HttpServletRequest request, Board board) {
-        String ipAddress = request.getRemoteAddr();
-        redisService.setSetOps(VIEW_COUNT_PREFIX + board.getId(), ipAddress);
-    }
 
     @Transactional
     public void deleteBoard(Long boardId) {
@@ -102,8 +103,8 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<Board> getNicknameBoardSlice(Pageable pageable, String nickname){
-        return boardRepository.findSliceByNicknameWithMember(pageable,nickname);
+    public Slice<Board> getNicknameBoardSlice(Pageable pageable, String nickname) {
+        return boardRepository.findSliceByNicknameWithMember(pageable, nickname);
     }
 
     @Transactional
