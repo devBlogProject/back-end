@@ -7,18 +7,12 @@ import com.multi.blogging.multiblogging.board.domain.Board;
 import com.multi.blogging.multiblogging.board.exception.BoardNotFoundException;
 import com.multi.blogging.multiblogging.board.repository.BoardRepository;
 import com.multi.blogging.multiblogging.heart.domain.Heart;
-import com.multi.blogging.multiblogging.heart.exception.HeartConflictException;
-import com.multi.blogging.multiblogging.heart.exception.HeartNotFoundException;
 import com.multi.blogging.multiblogging.heart.repository.HeartRepository;
-import com.multi.blogging.multiblogging.infra.redisDb.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -49,7 +43,7 @@ public class HeartService {
     }
 
     public List<Heart> getHearts(Long boardId) {
-        return heartRepository.findAllByBoardId(boardId);
+        return heartRepository.findAllByBoardIdWithMemberAndBoard(boardId);
 
     }
 }

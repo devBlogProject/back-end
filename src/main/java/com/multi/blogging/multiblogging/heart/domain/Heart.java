@@ -1,5 +1,6 @@
 package com.multi.blogging.multiblogging.heart.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.multi.blogging.multiblogging.auth.domain.Member;
 import com.multi.blogging.multiblogging.base.domain.BaseEntity;
 import com.multi.blogging.multiblogging.board.domain.Board;

@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface HeartRepository extends JpaRepository<Heart,Long>, CustomHeartRepository {
 
-    List<Heart> findAllByBoardId(Long boardId);
 }

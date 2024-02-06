@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.multi.blogging.multiblogging.auth.domain.QMember.member;
@@ -42,6 +43,14 @@ public class CustomHeartRepositoryImpl implements CustomHeartRepository {
                         .fetchOne());
     }
 
+    @Override
+    public List<Heart> findAllByBoardIdWithMemberAndBoard(Long boardId) {
+        return jpaQueryFactory.selectFrom(heart)
+                .leftJoin(heart.member, member).fetchJoin()
+                .leftJoin(heart.board, board).fetchJoin()
+                .where(heart.board.id.eq(boardId))
+                .fetch();
+    }
 
 
     @Override

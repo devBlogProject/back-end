@@ -63,11 +63,11 @@ class HeartRepositoryTest {
     }
 
     @Test
-    void findAllByBoardId(){
+    void findAllByBoardIdWithMemberAndBoard(){
          for (int i=0;i<10;i++){
              heartRepository.save(Heart.builder().board(testBoard).build());
          }
 
-         assertEquals(10,heartRepository.findAllByBoardId(testBoard.getId()).size());
+         assertEquals(10,heartRepository.findAllByBoardIdWithMemberAndBoard(testBoard.getId()).size());
     }
 }

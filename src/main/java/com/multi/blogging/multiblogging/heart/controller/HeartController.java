@@ -3,6 +3,7 @@ package com.multi.blogging.multiblogging.heart.controller;
 import com.multi.blogging.multiblogging.base.ApiResponse;
 import com.multi.blogging.multiblogging.base.SecurityUtil;
 import com.multi.blogging.multiblogging.heart.domain.Heart;
+import com.multi.blogging.multiblogging.heart.dto.HeartResponseDto;
 import com.multi.blogging.multiblogging.heart.service.HeartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class HeartController {
     }
 
     @GetMapping("/board/{board_id}")
-    public ApiResponse<List<Heart>> getHearts(@PathVariable("board_id") Long boardId){
-        return ApiResponse.createSuccess(heartService.getHearts(boardId));
+    public ApiResponse<List<HeartResponseDto>> getHearts(@PathVariable("board_id") Long boardId){
+        return ApiResponse.createSuccess(heartService.getHearts(boardId).stream().map(HeartResponseDto::of).toList());
     }
 }
