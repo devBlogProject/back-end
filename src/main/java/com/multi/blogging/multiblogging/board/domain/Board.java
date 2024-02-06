@@ -37,6 +37,7 @@ public class Board extends BaseEntity {
     private int postNumber;
 
     private int viewCount=0;
+    private int likeCount=0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

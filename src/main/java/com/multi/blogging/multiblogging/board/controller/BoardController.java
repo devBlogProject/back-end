@@ -63,6 +63,12 @@ public class BoardController {
         return ApiResponse.createSuccess(BoardResponseDto.of(board));
     }
 
+    @GetMapping("/{board_id}")
+    public ApiResponse<BoardResponseDto> getBoard(HttpServletRequest request,@PathVariable("board_id") Long boardId){
+        Board board = boardService.getBoard(request, boardId);
+        return ApiResponse.createSuccess(BoardResponseDto.of(board));
+    }
+
     @DeleteMapping("/{board_id}")
     public ApiResponse<?> deleteBoard(@PathVariable("board_id") Long boardId){
         boardService.deleteBoard(boardId);

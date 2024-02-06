@@ -15,25 +15,56 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class HeartService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
-    private final RedisService redisService;
-
-    private final String HEART_PREFIX = "Heart ";
+    private final HeartRepository heartRepository;
+//    private final String HEART_PREFIX = "Heart ";
 
     public void insert(String memberEmail, Long boardId) {
-        redisService.setSetOps(HEART_PREFIX+boardId,memberEmail);
+        Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
+        var optionalHeart = heartRepository.findByMemberAndBoard(member.getId(), boardId);
+        if (optionalHeart.isEmpty()) {
+            Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+            board.setLikeCount(board.getLikeCount() + 1);
+            heartRepository.save(new Heart(member, board));
+        }
     }
 
     public void delete(String memberEmail, Long boardId) {
-        redisService.deleteSetOps(HEART_PREFIX+boardId,memberEmail);
+        Member member = memberRepository.findOneByEmail(memberEmail).orElseThrow(MemberNotFoundException::new);
+        Board board = boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        var optionalHeart = heartRepository.findByMemberAndBoard(member.getId(), boardId);
+
+        board.setLikeCount(board.getLikeCount() - 1);
+        optionalHeart.ifPresent(heartRepository::delete);
     }
-    public Set<Object> getHearts(Long boardId){
-        return redisService.getSetOps(HEART_PREFIX + boardId);
+
+    public List<Heart> getHearts(Long boardId) {
+        return heartRepository.findAllByBoardId(boardId);
+
     }
 }
+
+//    public void transferHeartsToDb(){
+//        Map<String, Set> boardIdAndAddressMap = redisService.getKeyAndSetOpsContainPrefix(HEART_PREFIX);
+//        for (String key : boardIdAndAddressMap.keySet()) {
+//            Set IPAddresses = boardIdAndAddressMap.get(key);
+//            Long boardId = Long.valueOf(key.replace(VIEW_COUNT_PREFIX, ""));
+//            Optional<Board> board=boardRepository.findById(boardId);
+//            if (board.isPresent()){
+//                int oldViewCount = board.get().getViewCount();
+//                int newViewCount = oldViewCount + IPAddresses.size();
+//                board.get().setViewCount(newViewCount);
+//            }
+//        }
+//    }
+

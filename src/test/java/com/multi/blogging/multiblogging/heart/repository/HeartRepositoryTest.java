@@ -61,4 +61,13 @@ class HeartRepositoryTest {
         heartRepository.save(Heart.builder().member(testMember).board(testBoard).build());
         assertTrue(heartRepository.findByMemberAndBoard(testMember.getId(), testBoard.getId()).isPresent());
     }
+
+    @Test
+    void findAllByBoardId(){
+         for (int i=0;i<10;i++){
+             heartRepository.save(Heart.builder().board(testBoard).build());
+         }
+
+         assertEquals(10,heartRepository.findAllByBoardId(testBoard.getId()).size());
+    }
 }

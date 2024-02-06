@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
 import static com.multi.blogging.multiblogging.auth.domain.QMember.member;
@@ -21,6 +22,7 @@ import static com.multi.blogging.multiblogging.heart.domain.QHeart.heart;
 public class CustomHeartRepositoryImpl implements CustomHeartRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
+
     @Override
     public Optional<Heart> findByMemberAndBoard(Long memberId, Long boardId) {
         return Optional.ofNullable(
@@ -34,11 +36,13 @@ public class CustomHeartRepositoryImpl implements CustomHeartRepository {
     public Optional<Heart> findByMemberAndBoardWithMember(Long memberId, Long boardId) {
         return Optional.ofNullable(
                 jpaQueryFactory.selectFrom(heart)
-                        .leftJoin(heart.member,member).fetchJoin()
+                        .leftJoin(heart.member, member).fetchJoin()
                         .where(heart.member.id.eq(memberId)
                                 .and(heart.board.id.eq(boardId)))
                         .fetchOne());
     }
+
+
 
     @Override
     public int getCountByBoard(Long boardId) {

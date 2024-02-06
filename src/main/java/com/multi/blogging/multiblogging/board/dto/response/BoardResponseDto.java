@@ -23,13 +23,14 @@ public class BoardResponseDto extends BaseResponseDto {
     private MemberResponseDto author;
     private int postNum;
     private int viewCount;
+    private int likeCount;
 //    LocalDateTime createdDate;
 //    LocalDateTime updatedTime;
 
 
 
     @Builder
-    public BoardResponseDto(Long id, String title, String content, Long categoryId, String thumbnailUrl, MemberResponseDto authorResponseDto, LocalDateTime createdDate, LocalDateTime updatedDate,int postNum,int viewCount){
+    public BoardResponseDto(Long id, String title, String content, Long categoryId,String thumbnailUrl, MemberResponseDto authorResponseDto, LocalDateTime createdDate, LocalDateTime updatedDate,int postNum,int viewCount,int likeCount){
         this.id=id;
         this.title=title;
         this.content = content;
@@ -40,6 +41,7 @@ public class BoardResponseDto extends BaseResponseDto {
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
         this.viewCount=viewCount;
+        this.likeCount=likeCount;
     }
 
     public static BoardResponseDto of(Board board) {

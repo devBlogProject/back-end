@@ -50,6 +50,19 @@ public class BoardService {
         return board;
     }
 
+    @Transactional
+    public Board getBoard(HttpServletRequest request, Long id){
+        Board board = boardRepository.findById(id).orElseThrow(BoardNotFoundException::new);
+        String ipAddress = request.getRemoteAddr();
+        if (!boardRedisClient.getClientIpAddressOfBoard(board).contains(ipAddress)) { // 현재 유저의 ip정보가 레디스에 없다면
+            boardRedisClient.addClientIpToCache(ipAddress, board);
+            int curViewCount = board.getViewCount();
+            board.setViewCount(curViewCount + 1);
+        }
+
+        return board;
+    }
+
 //    @Scheduled(fixedDelay = 1000 * 60*3) //3분마다 반영
 //    @Transactional
 //    public void transferViewCountToDb() {

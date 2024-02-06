@@ -98,6 +98,8 @@ class HeartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(10))
                 .andDo(print());
+
+        assertEquals(10,board.getLikeCount());
     }
 
     @Test
@@ -114,5 +116,7 @@ class HeartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(0))
                 .andDo(print());
+
+        assertEquals(0,board.getLikeCount());
     }
 }
