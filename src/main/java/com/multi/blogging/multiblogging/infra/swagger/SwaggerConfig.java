@@ -17,7 +17,8 @@ public class SwaggerConfig {
 
         Info info = new Info()
                 .version("v1.0.0")
-                .title("API");
+                .title("API")
+                .description("API 문서");
 
         // SecuritySecheme명
         String jwtSchemeName = "jwtAuth";
